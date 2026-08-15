@@ -143,6 +143,28 @@
     background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
   .frame img { max-width: 100%; max-height: 100%; border-radius: 16px; display: block; }
 
+  /* before/after compare slider, the "nagih" reveal moment */
+  .compare { --split: 55%; }
+  .cmp-frame { position: relative; border-radius: 26px; overflow: hidden; box-shadow: var(--press-sm); aspect-ratio: 1/1; background: var(--mint-soft); user-select: none; container-type: size; }
+  .cmp-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; display: block; padding: 10px; }
+  .cmp-after { position: absolute; inset: 0; width: var(--split); overflow: hidden; border-right: 3px solid var(--cream); }
+  .cmp-after .cmp-img { width: 100%; }
+  /* the after pane holds a fixed-width image so both halves line up: size to frame */
+  .cmp-after.alpha { background-color: #DBEFE1; background-image:
+      linear-gradient(45deg,#BFE3CB 25%,transparent 25%),linear-gradient(-45deg,#BFE3CB 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#BFE3CB 75%),linear-gradient(-45deg,transparent 75%,#BFE3CB 75%);
+    background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
+  .cmp-after .cmp-img { width: 100cqw; }
+  .cmp-handle { position: absolute; top: 0; bottom: 0; left: var(--split); width: 3px; background: var(--cream); transform: translateX(-1.5px); pointer-events: none; }
+  .cmp-grip { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 42px; height: 42px; border-radius: 999px; background: var(--cream); box-shadow: var(--raise-sm); display: grid; place-items: center; color: var(--primary); }
+  .cmp-grip svg { width: 22px; height: 22px; }
+  .cmp-tag { position: absolute; bottom: 12px; font-family: var(--font-round); font-weight: 700; font-size: .72rem; padding: 5px 11px; border-radius: 999px; background: rgba(242,251,243,.85); color: var(--muted); backdrop-filter: blur(4px); }
+  .cmp-tag-l { left: 12px; } .cmp-tag-r { right: 12px; color: var(--primary); }
+  .cmp-range { -webkit-appearance: none; appearance: none; width: 100%; margin: 14px 0 0; height: 26px; background: transparent; cursor: ew-resize; }
+  .cmp-range::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; border-radius: 999px; background: var(--primary); box-shadow: var(--raise-sm); border: 3px solid var(--cream); }
+  .cmp-range::-moz-range-thumb { width: 26px; height: 26px; border-radius: 999px; background: var(--primary); box-shadow: var(--raise-sm); border: 3px solid var(--cream); }
+  .cmp-range:focus-visible { outline: none; }
+  .cmp-range:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 5px rgba(31,114,79,.35), var(--raise-sm); }
+
   /* states */
   .state { text-align: center; padding: 10px 0 0; min-height: 24px; }
   .state[hidden] { display: none; }
@@ -319,9 +341,22 @@
     <!-- Result -->
     <section class="card" id="result-panel" aria-labelledby="res-h" hidden>
       <h2 id="res-h">Nih hasilnya</h2>
-      <div class="previews">
-        <div class="shot"><div class="cap">Sebelum</div><div class="frame"><img id="img-before" alt="Foto asli sebelum diproses" /></div></div>
-        <div class="shot"><div class="cap">Sesudah</div><div class="frame alpha"><img id="img-after" alt="Foto tanpa background" /></div></div>
+      <div class="compare" id="compare">
+        <div class="cmp-frame">
+          <img id="img-before" class="cmp-img" alt="Foto asli sebelum diproses" />
+          <div class="cmp-after alpha" id="cmp-after-wrap">
+            <img id="img-after" class="cmp-img" alt="Foto tanpa background" />
+          </div>
+          <div class="cmp-handle" id="cmp-handle" aria-hidden="true">
+            <span class="cmp-grip">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg>
+            </span>
+          </div>
+          <span class="cmp-tag cmp-tag-l">Sebelum</span>
+          <span class="cmp-tag cmp-tag-r">Sesudah</span>
+        </div>
+        <input type="range" id="cmp-range" class="cmp-range" min="0" max="100" value="55"
+          aria-label="Geser untuk banding sebelum dan sesudah" />
       </div>
       <div class="actions">
         <button id="download" class="btn btn-primary btn-full">

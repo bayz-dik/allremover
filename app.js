@@ -9,6 +9,7 @@ const tray = $("tray"), fileInput = $("file"), runBtn = $("run"), resetBtn = $("
 const stEmpty = $("state-empty"), stLoad = $("state-loading"), stErr = $("state-error");
 const bar = $("bar"), loadingMsg = $("loading-msg"), errMsg = $("error-msg");
 const resultPanel = $("result-panel"), imgBefore = $("img-before"), imgAfter = $("img-after");
+const cmpAfterWrap = $("cmp-after-wrap"), cmpRange = $("cmp-range");
 const downloadBtn = $("download");
 const overlay = $("overlay"), modal = $("modal"), openPremium = $("open-premium");
 const modalClose = $("modal-close"), unlockBtn = $("unlock");
@@ -109,9 +110,17 @@ runBtn.addEventListener("click", async () => {
 });
 
 async function renderResult() {
-  if (currentBg === "transparent") { imgAfter.src = cutoutURL; imgAfter.parentElement.classList.add("alpha"); return; }
-  imgAfter.parentElement.classList.remove("alpha");
+  if (currentBg === "transparent") { imgAfter.src = cutoutURL; cmpAfterWrap.classList.add("alpha"); return; }
+  cmpAfterWrap.classList.remove("alpha");
   imgAfter.src = await composite(cutoutURL, currentBg, null);
+}
+
+// before/after slider: drive the --split var on the .compare wrapper
+if (cmpRange) {
+  const cmp = document.getElementById("compare");
+  const setSplit = (v) => cmp.style.setProperty("--split", v + "%");
+  cmpRange.addEventListener("input", (e) => setSplit(e.target.value));
+  setSplit(cmpRange.value);
 }
 
 // Compose cutout onto a background at a target longest-edge (cap=null => full res).
