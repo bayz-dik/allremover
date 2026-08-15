@@ -192,6 +192,11 @@
 
   @media (prefers-reduced-motion: reduce) { *, .mascot { animation: none !important; transition: none !important; } }
 
+  /* scroll-reveal: a card rises into place once, when it first appears */
+  .reveal { opacity: 0; transform: translateY(18px) scale(.99); }
+  .reveal.in { opacity: 1; transform: none; transition: opacity .5s ease, transform .55s var(--spring); }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1 !important; transform: none !important; } }
+
   /* success confetti burst, one-shot on a finished cutout (respects reduced-motion) */
   .confetti { position: fixed; inset: 0; pointer-events: none; z-index: 70; overflow: hidden; }
   .confetti[hidden] { display: none; }
@@ -366,7 +371,7 @@
     </section>
 
     <!-- Result -->
-    <section class="card" id="result-panel" aria-labelledby="res-h" hidden>
+    <section class="card reveal" id="result-panel" aria-labelledby="res-h" hidden>
       <h2 id="res-h">Nih hasilnya</h2>
       <div class="compare" id="compare">
         <div class="cmp-frame">
@@ -386,9 +391,13 @@
           aria-label="Geser untuk banding sebelum dan sesudah" />
       </div>
       <div class="actions">
-        <button id="download" class="btn btn-primary btn-full">
+        <button id="download" class="btn btn-primary">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
           Download PNG
+        </button>
+        <button id="share" class="btn" hidden>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+          Bagikan
         </button>
       </div>
 
@@ -424,7 +433,7 @@
     </section>
 
     <!-- Batch (Pro): many photos at once -->
-    <section class="card" id="batch-panel" aria-labelledby="batch-h" hidden>
+    <section class="card reveal" id="batch-panel" aria-labelledby="batch-h" hidden>
       <h2 id="batch-h">Antrian foto <span class="chip-gold">PRO</span></h2>
       <div id="batch-grid" class="batch-grid"></div>
       <div class="actions">

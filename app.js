@@ -10,7 +10,7 @@ const stEmpty = $("state-empty"), stLoad = $("state-loading"), stErr = $("state-
 const bar = $("bar"), loadingMsg = $("loading-msg"), errMsg = $("error-msg");
 const resultPanel = $("result-panel"), imgBefore = $("img-before"), imgAfter = $("img-after");
 const cmpAfterWrap = $("cmp-after-wrap"), cmpRange = $("cmp-range");
-const downloadBtn = $("download");
+const downloadBtn = $("download"), shareBtn = $("share");
 const overlay = $("overlay"), modal = $("modal"), openPremium = $("open-premium");
 const modalClose = $("modal-close"), unlockBtn = $("unlock");
 const proControls = $("pro-controls");
@@ -38,6 +38,14 @@ function showToast(msg) {
   showToast._t = setTimeout(() => toast.classList.remove("show"), 2600);
 }
 function loadImage(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
+
+// reveal a hidden .reveal card: unhide, then add .in on the next frame so the
+// transition runs. Idempotent — safe to call every time the panel is shown.
+function reveal(el) {
+  if (!el) return;
+  el.hidden = false;
+  requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add("in")));
+}
 
 // one-shot confetti burst on a finished cutout. CSS handles reduced-motion
 // (the layer is display:none there), so bail early to skip the DOM work too.
@@ -137,7 +145,8 @@ runBtn.addEventListener("click", async () => {
     currentBg = "transparent";
     await renderResult();
     await updateQualityDims();
-    resultPanel.hidden = false;
+    reveal(resultPanel);
+    updateShareAvail();
     showState("empty");
     stEmpty.querySelector(".msg").textContent = "Jadi! Download di bawah.";
     resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -209,6 +218,12 @@ function setQuality(q) {
 }
 
 // ---------- download single ----------
+async function exportBlob() {
+  const cap = (quality === "hd" && isPro) ? null : FREE_MAX;
+  const dataURL = await composite(cutoutURL, currentBg, cap);
+  const res = await fetch(dataURL);
+  return res.blob();
+}
 downloadBtn.addEventListener("click", async () => {
   if (!cutoutBlob) return;
   const cap = (quality === "hd" && isPro) ? null : FREE_MAX;
@@ -218,13 +233,36 @@ downloadBtn.addEventListener("click", async () => {
   showToast(quality === "hd" && isPro ? "Kesimpen (HD)" : "Kesimpen ke Download");
 });
 
+// ---------- share (Web Share API, files level) ----------
+// Only show the button where sharing a file actually works, so we never ship a
+// dead control. Falls back to sharing the site link if file-share is missing.
+function updateShareAvail() {
+  const canShare = !!(navigator.canShare && navigator.share);
+  shareBtn.hidden = !canShare;
+}
+shareBtn.addEventListener("click", async () => {
+  if (!cutoutBlob) return;
+  shareBtn.disabled = true;
+  try {
+    const blob = await exportBlob();
+    const file = new File([blob], "allremover-cutout.png", { type: "image/png" });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: "AllRemover", text: "Background kebuang pakai AllRemover" });
+    } else if (navigator.share) {
+      await navigator.share({ title: "AllRemover", text: "Hapus background gratis di HP", url: location.href });
+    }
+  } catch (e) {
+    if (e && e.name !== "AbortError") { console.error(e); showToast("Gagal bagikan"); }
+  } finally { shareBtn.disabled = false; }
+});
+
 // ---------- reset ----------
 resetBtn.addEventListener("click", () => {
   sourceFile = null; cutoutBlob = null;
   if (cutoutURL) { URL.revokeObjectURL(cutoutURL); cutoutURL = null; }
   fileInput.value = "";
   imgBefore.removeAttribute("src"); imgAfter.removeAttribute("src");
-  resultPanel.hidden = true;
+  resultPanel.hidden = true; resultPanel.classList.remove("in");
   runBtn.disabled = true; resetBtn.disabled = true;
   showState("empty");
   stEmpty.querySelector(".msg").textContent = "Belum ada foto, pilih dulu ya.";
@@ -238,6 +276,7 @@ function addToBatch(files) {
     batch.push(item);
   });
   batchPanel.hidden = false;
+  reveal(batchPanel);
   renderBatch();
   batchPanel.scrollIntoView({ behavior: "smooth", block: "start" });
   showToast(files.length + " foto masuk antrian");
@@ -274,7 +313,7 @@ batchRun.addEventListener("click", async () => {
 });
 batchClear.addEventListener("click", () => {
   batch.forEach(it => { URL.revokeObjectURL(it.srcURL); if (it.cutoutURL) URL.revokeObjectURL(it.cutoutURL); });
-  batch = []; batchPanel.hidden = true; renderBatch();
+  batch = []; batchPanel.hidden = true; batchPanel.classList.remove("in"); renderBatch();
 });
 batchZip.addEventListener("click", async () => {
   const done = batch.filter(b => b.status === "done" && b.cutoutBlob);
