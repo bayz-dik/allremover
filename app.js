@@ -39,6 +39,31 @@ function showToast(msg) {
 }
 function loadImage(src) { return new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = src; }); }
 
+// one-shot confetti burst on a finished cutout. CSS handles reduced-motion
+// (the layer is display:none there), so bail early to skip the DOM work too.
+function celebrate() {
+  const layer = $("confetti");
+  const mascot = document.querySelector(".mascot");
+  if (mascot && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    mascot.classList.remove("cheer"); void mascot.offsetWidth; mascot.classList.add("cheer");
+  }
+  if (!layer || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const colors = ["#E76F51", "#2E9366", "#E9B949", "#B7E5BA", "#1F724F"];
+  const n = 34;
+  let html = "";
+  for (let i = 0; i < n; i++) {
+    const left = Math.random() * 100;
+    const delay = Math.random() * 180;
+    const dur = 1000 + Math.random() * 500;
+    const c = colors[i % colors.length];
+    html += `<i style="left:${left}%;background:${c};animation-delay:${delay}ms;animation-duration:${dur}ms"></i>`;
+  }
+  layer.innerHTML = html;
+  layer.hidden = false;
+  clearTimeout(celebrate._t);
+  celebrate._t = setTimeout(() => { layer.hidden = true; layer.innerHTML = ""; }, 1900);
+}
+
 // ---------- file intake (single or batch) ----------
 function acceptFiles(files) {
   const imgs = Array.from(files).filter(f => f.type.startsWith("image/"));
@@ -75,6 +100,21 @@ fileInput.addEventListener("change", (e) => { if (e.target.files.length) acceptF
 ["dragleave", "drop"].forEach(ev => tray.addEventListener(ev, (e) => { e.preventDefault(); tray.classList.remove("dragover"); }));
 tray.addEventListener("drop", (e) => { if (e.dataTransfer.files.length) acceptFiles(e.dataTransfer.files); });
 
+// ---------- try a sample (no upload needed) ----------
+const trySample = $("try-sample");
+if (trySample) trySample.addEventListener("click", async () => {
+  trySample.disabled = true;
+  try {
+    const res = await fetch("sample.png");
+    const blob = await res.blob();
+    acceptSingle(new File([blob], "contoh.png", { type: "image/png" }));
+    showToast("Contoh siap. Tekan Hapus Background");
+    runBtn.focus();
+  } catch (e) {
+    console.error(e); showToast("Gagal muat contoh");
+  } finally { trySample.disabled = false; }
+});
+
 // ---------- run single ----------
 runBtn.addEventListener("click", async () => {
   if (!sourceFile) return;
@@ -102,6 +142,7 @@ runBtn.addEventListener("click", async () => {
     stEmpty.querySelector(".msg").textContent = "Jadi! Download di bawah.";
     resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     showToast("Background kebuang!");
+    celebrate();
   } catch (err) {
     console.error(err);
     showState("error");
