@@ -35,6 +35,34 @@ python -m http.server 8777
 # lalu buka http://localhost:8777
 ```
 
+## Deploy ke Vercel
+
+Repo ini statis (tanpa build step), jadi deploy-nya instan:
+
+1. Buka https://vercel.com → **Add New → Project**.
+2. **Import** repo `bayz-dik/allremover` (login pakai GitHub).
+3. Framework Preset: **Other**. Build Command: kosong. Output Directory: `.` (root).
+4. **Deploy**. Selesai — dapat URL `https://allremover.vercel.app` (atau nama pilihanmu).
+
+`vercel.json` sudah mengatur header `sw.js` (no-cache + `Service-Worker-Allowed`)
+supaya PWA/offline berfungsi benar. Tiap `git push` ke `main` otomatis re-deploy.
+
+Alternatif CLI: `npm i -g vercel && vercel --prod` dari folder ini.
+
+## PWA (Progressive Web App)
+
+Situs bisa dipasang seperti aplikasi ("Add to Home Screen"):
+
+- `manifest.webmanifest` — nama, ikon (192/512/maskable), warna tema, mode standalone.
+- `sw.js` — service worker yang cache app shell, jadi UI kebuka **offline** setelah
+  kunjungan pertama. Engine AI (esm.sh) di-cache oleh HTTP cache browser.
+- Tombol **Pasang** di header muncul otomatis di browser yang mendukung
+  `beforeinstallprompt` (mis. Chrome Android/desktop). Di iOS pakai
+  Safari → Share → *Add to Home Screen*.
+
+PWA butuh HTTPS — jalan di GitHub Pages & Vercel, tidak di `file://`.
+
+
 ## Monetisasi
 
 Semua diatur di `config.js` — kosong = slot placeholder yang jujur, tidak pernah iklan palsu.
@@ -53,6 +81,9 @@ Semua diatur di `config.js` — kosong = slot placeholder yang jujur, tidak pern
 | `app.js` | Logika remove-bg, Pro, batch, monetisasi |
 | `config.js` | Konfigurasi iklan/donasi/affiliate |
 | `logo.svg` | Logo (mascot blob) |
+| `manifest.webmanifest` | Metadata PWA (ikon, warna, standalone) |
+| `sw.js` | Service worker (cache app shell, offline) |
+| `vercel.json` | Header deploy (SW + manifest) |
 | `DESIGN.md` | Arah desain: palet, tipografi, motion |
 | `preview-logo.html` | Pratinjau logo di berbagai ukuran |
 

@@ -1,0 +1,17 @@
+{
+  "name": "AllRemover — hapus background",
+  "short_name": "AllRemover",
+  "description": "Hapus background foto gratis, langsung di HP kamu. Gak upload, gak daftar.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2FBF3",
+  "theme_color": "#1F724F",
+  "lang": "id",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

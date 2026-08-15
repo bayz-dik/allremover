@@ -458,3 +458,30 @@ function initTiles() {
 }
 initAds();
 initTiles();
+
+// ---------- PWA: install prompt + service worker ----------
+const installBtn = $("install");
+let deferredPrompt = null;
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (installBtn) installBtn.hidden = false;
+});
+if (installBtn) installBtn.addEventListener("click", async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  installBtn.hidden = true;
+});
+window.addEventListener("appinstalled", () => {
+  deferredPrompt = null;
+  if (installBtn) installBtn.hidden = true;
+  showToast("AllRemover kepasang!");
+});
+// register the service worker (offline shell). Only on https/localhost.
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch((e) => console.warn("SW failed", e));
+  });
+}

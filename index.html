@@ -20,6 +20,7 @@
 <meta name="twitter:description" content="Gratis, jalan di HP kamu. Gak upload, gak daftar." />
 <meta name="twitter:image" content="https://bayz-dik.github.io/allremover/og-image.png" />
 <meta name="theme-color" content="#1F724F" />
+<link rel="manifest" href="manifest.webmanifest" />
 <!-- AdSense loader is injected by app.js only when a real client id is set in config.js -->
 <style>
   :root {
@@ -71,6 +72,14 @@
   .brand .name span { color: var(--primary); }
   .free-tag { margin-left: auto; font-family: var(--font-round); font-weight: 700; font-size: .8rem;
     color: var(--primary); background: var(--mint-soft); padding: 8px 14px; border-radius: 999px; box-shadow: var(--press-sm); }
+  .install-btn { font-family: var(--font-round); font-weight: 700; font-size: .8rem; border: none; cursor: pointer;
+    color: #fff; background: var(--primary); padding: 8px 14px; border-radius: 999px; box-shadow: var(--raise-sm);
+    display: inline-flex; align-items: center; gap: 6px; outline: none; transition: transform .16s var(--spring), box-shadow .16s; }
+  .install-btn svg { width: 15px; height: 15px; }
+  .install-btn:hover { transform: translateY(-2px); }
+  .install-btn:active { transform: scale(.96); box-shadow: var(--press-sm); }
+  .install-btn:focus-visible { box-shadow: 0 0 0 4px rgba(31,114,79,.4), var(--raise-sm); }
+  .install-btn[hidden] { display: none; }
 
   .hero { text-align: center; margin-bottom: 32px; }
   .mascot {
@@ -310,6 +319,10 @@
         <div class="name">All<span>Remover</span></div>
       </div>
       <div class="free-tag">GRATIS</div>
+      <button id="install" class="install-btn" type="button" hidden>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+        Pasang
+      </button>
     </div>
 
     <section class="hero">
