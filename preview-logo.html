@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AllRemover — logo preview</title>
+<style>
+  :root{
+    --primary:#1F724F;--mint:#B7E5BA;--mint-soft:#DBEFE1;--cream:#F2FBF3;
+    --ink:#12352A;--muted:#3F6B57;--clay-dark:#B7D8C2;
+    --font-round:-apple-system,"SF Pro Rounded","Segoe UI",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--cream);color:var(--ink);font-family:var(--font-round);
+    padding:40px 20px 80px;display:flex;flex-direction:column;align-items:center;gap:40px}
+  h1{font-size:1.6rem;letter-spacing:-.02em;margin:0}
+  .sub{color:var(--muted);font-size:.95rem;margin:-28px 0 0}
+  .row{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:center}
+  .card{background:var(--cream);border-radius:32px;
+    box-shadow:18px 18px 30px var(--clay-dark),-18px -18px 30px #fff;
+    padding:32px;display:flex;flex-direction:column;align-items:center;gap:14px}
+  .card .lbl{font-size:.8rem;color:var(--muted)}
+  img{display:block}
+  .s512{width:200px;height:200px}
+  .s128{width:128px;height:128px}
+  .s64{width:64px;height:64px}
+  .s32{width:32px;height:32px}
+  .darkchip{background:var(--ink);border-radius:24px;padding:24px}
+  .brandline{display:flex;align-items:center;gap:14px}
+  .brandline img{width:52px;height:52px}
+  .brandline .name{font-weight:800;font-size:1.8rem;letter-spacing:-.02em}
+  .brandline .name span{color:var(--primary)}
+  .fav{display:flex;gap:10px;align-items:center;background:#fff;border-radius:12px 12px 0 0;
+    padding:8px 14px 8px 10px;box-shadow:0 6px 20px rgba(18,53,42,.12)}
+  .fav img{width:16px;height:16px}
+  .fav span{font-size:.82rem;color:#444}
+</style>
+</head>
+<body>
+  <h1>AllRemover — logo</h1>
+  <p class="sub">Satu karakter blob yang sama dipakai di logo, hero, dan favicon.</p>
+
+  <div class="row">
+    <div class="card"><img class="s512" src="logo.svg" alt="logo 512" /><span class="lbl">App icon · 512</span></div>
+    <div class="card darkchip"><img class="s128" src="logo.svg" alt="logo on dark" /><span class="lbl" style="color:#B7E5BA">di latar gelap</span></div>
+  </div>
+
+  <div class="row">
+    <div class="card"><img class="s128" src="logo.svg" alt="logo 128" /><span class="lbl">128</span></div>
+    <div class="card"><img class="s64" src="logo.svg" alt="logo 64" /><span class="lbl">64</span></div>
+    <div class="card"><img class="s32" src="logo.svg" alt="logo 32" /><span class="lbl">32 (favicon)</span></div>
+  </div>
+
+  <div class="card">
+    <div class="brandline">
+      <img src="logo.svg" alt="AllRemover" />
+      <div class="name">All<span>Remover</span></div>
+    </div>
+    <span class="lbl">lockup header</span>
+  </div>
+
+  <div class="card">
+    <div class="fav"><img src="logo.svg" alt="tab" /><span>AllRemover, hapus background…</span></div>
+    <span class="lbl">tampilan tab browser</span>
+  </div>
+
+  <p class="sub" style="max-width:440px;text-align:center;margin-top:8px">
+    Cek: apakah wajah blob masih kebaca jelas di ukuran 32px? Kalau ya, logo lolos.
+    Buka <b>index.html</b> untuk melihatnya hidup di halaman asli.
+  </p>
+</body>
+</html>

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AllRemover, hapus background sat set</title>
+<meta name="description" content="Hapus background foto gratis, langsung di HP kamu. Gak perlu upload, gak perlu daftar." />
+<link rel="icon" type="image/svg+xml" href="logo.svg" />
+<!-- AdSense loader is injected by app.js only when a real client id is set in config.js -->
+<style>
+  :root {
+    --primary: #1F724F;
+    --primary-bright: #2E9366;
+    --primary-press: #175C3F;
+    --mint: #B7E5BA;
+    --mint-soft: #DBEFE1;
+    --cream: #F2FBF3;
+    --ink: #12352A;
+    --muted: #3F6B57;
+    --accent: #E76F51;
+    --accent-press: #D65B3D;
+    --accent-ink: #5A1E12;
+    --gold: #E9B949;
+    --gold-ink: #3A2A00;
+    --danger: #B23A2A;
+    --clay-light: #FFFFFF;
+    --clay-dark: #B7D8C2;
+
+    --blur: 30px; --off: 18px;
+    /* colored clay shadow, NOT grey */
+    --raise: var(--off) var(--off) var(--blur) var(--clay-dark),
+             calc(-1 * var(--off)) calc(-1 * var(--off)) var(--blur) var(--clay-light);
+    --raise-sm: 8px 8px 18px var(--clay-dark), -8px -8px 18px var(--clay-light);
+    --press-sm: inset 6px 6px 12px var(--clay-dark), inset -6px -6px 12px var(--clay-light);
+    --press: inset var(--off) var(--off) var(--blur) var(--clay-dark),
+             inset calc(-1 * var(--off)) calc(-1 * var(--off)) var(--blur) var(--clay-light);
+
+    --spring: cubic-bezier(.34,1.56,.64,1);
+    --font-round: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+    --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--font-text); -webkit-font-smoothing: antialiased; }
+  body { min-height: 100dvh; display: flex; justify-content: center; padding: 24px 18px 72px; }
+  .app { width: 100%; max-width: 600px; }
+
+  /* soft mint blobs in the far background for depth, subtle, no full-page glow */
+  .bg-blob { position: fixed; border-radius: 50%; filter: blur(40px); z-index: -1; opacity: .5; }
+  .bg-blob.a { width: 320px; height: 320px; background: #C7ECCB; top: -80px; right: -80px; }
+  .bg-blob.b { width: 260px; height: 260px; background: #DDEFE0; bottom: -60px; left: -70px; }
+
+  /* ---------- header / hero ---------- */
+  .top { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand img { width: 46px; height: 46px; display: block; }
+  .brand .name { font-family: var(--font-round); font-weight: 800; font-size: 1.5rem; letter-spacing: -0.02em; }
+  .brand .name span { color: var(--primary); }
+  .free-tag { margin-left: auto; font-family: var(--font-round); font-weight: 700; font-size: .8rem;
+    color: var(--primary); background: var(--mint-soft); padding: 8px 14px; border-radius: 999px; box-shadow: var(--press-sm); }
+
+  .hero { text-align: center; margin-bottom: 32px; }
+  .mascot {
+    width: 128px; height: 128px; margin: 0 auto 18px; border-radius: 60px;
+    background: linear-gradient(150deg, #2E9366, #1B6A49); box-shadow: var(--raise); position: relative;
+    display: grid; place-items: center; animation: bob 3.6s var(--spring) infinite;
+  }
+  @keyframes bob { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-9px) } }
+  .mascot svg { width: 78px; height: 78px; }
+  .hero h1 { font-family: var(--font-round); font-weight: 800; font-size: 2.4rem; letter-spacing: -0.03em; margin: 0 0 8px; line-height: 1.05; }
+  .hero p { color: var(--muted); font-size: 1.05rem; margin: 0; }
+
+  /* ---------- cards ---------- */
+  .card { background: var(--cream); border-radius: 40px; box-shadow: var(--raise); padding: 28px; margin-bottom: 26px; }
+  h2 { font-family: var(--font-round); font-size: 1.35rem; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 18px; }
+
+  /* drop tray, skeuomorphic tray with checker interior */
+  .tray {
+    border-radius: 30px; background: var(--cream); box-shadow: var(--press);
+    padding: 40px 24px; text-align: center; cursor: pointer; outline: none;
+    border: 3px dashed transparent; transition: border-color .2s, transform .2s var(--spring);
+    position: relative; overflow: hidden;
+  }
+  .tray::before {
+    content: ""; position: absolute; inset: 0; opacity: .18; z-index: 0;
+    background-image: linear-gradient(45deg,#9fd3ac 25%,transparent 25%),linear-gradient(-45deg,#9fd3ac 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#9fd3ac 75%),linear-gradient(-45deg,transparent 75%,#9fd3ac 75%);
+    background-size: 22px 22px; background-position: 0 0,0 11px,11px -11px,-11px 0;
+  }
+  .tray > * { position: relative; z-index: 1; }
+  .tray:hover { transform: scale(1.01); }
+  .tray.dragover { border-color: var(--primary); box-shadow: var(--raise); }
+  .tray:focus-visible { border-color: var(--primary); box-shadow: 0 0 0 5px rgba(31,114,79,.35), var(--press); }
+  .tray .ic { width: 72px; height: 72px; margin: 0 auto 14px; border-radius: 24px; background: var(--mint); box-shadow: var(--raise-sm); display: grid; place-items: center; }
+  .tray .ic svg { width: 34px; height: 34px; stroke: var(--primary); }
+  .tray .big { font-family: var(--font-round); font-weight: 700; font-size: 1.1rem; }
+  .tray .small { color: var(--muted); font-size: .88rem; margin-top: 4px; }
+
+  /* buttons */
+  .btn {
+    font-family: var(--font-round); font-weight: 700; font-size: 1rem; border: none; cursor: pointer;
+    padding: 16px 24px; border-radius: 999px; background: var(--mint); color: var(--ink);
+    box-shadow: var(--raise-sm); display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    outline: none; transition: transform .16s var(--spring), box-shadow .16s, background .16s;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:active { transform: scale(.96); box-shadow: var(--press-sm); }
+  .btn:focus-visible { box-shadow: 0 0 0 5px rgba(31,114,79,.35), var(--raise-sm); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: var(--raise-sm); }
+  .btn svg { width: 20px; height: 20px; }
+
+  .btn-primary { background: var(--primary); color: #fff; }
+  .btn-primary:active { background: var(--primary-press); }
+  .btn-primary:focus-visible { box-shadow: 0 0 0 5px rgba(31,114,79,.45), var(--raise-sm); }
+  .btn-donate { background: var(--accent); color: #fff; }
+  .btn-donate:active { background: var(--accent-press); }
+  .btn-donate:focus-visible { box-shadow: 0 0 0 5px rgba(231,111,81,.5), var(--raise-sm); }
+  .btn-gold { background: var(--gold); color: var(--gold-ink); }
+  .btn-full { width: 100%; }
+
+  .actions { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+  .actions .btn { flex: 1 1 150px; }
+
+  /* previews */
+  .previews { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 480px) { .previews { grid-template-columns: 1fr; } }
+  .shot .cap { font-family: var(--font-round); font-weight: 700; font-size: .85rem; color: var(--muted); margin-bottom: 8px; text-align: center; }
+  .frame { border-radius: 26px; background: var(--mint-soft); box-shadow: var(--press-sm); padding: 10px; aspect-ratio: 1/1; display: grid; place-items: center; overflow: hidden; }
+  .frame.alpha { background-color: #DBEFE1; background-image:
+      linear-gradient(45deg,#BFE3CB 25%,transparent 25%),linear-gradient(-45deg,#BFE3CB 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#BFE3CB 75%),linear-gradient(-45deg,transparent 75%,#BFE3CB 75%);
+    background-size: 20px 20px; background-position: 0 0,0 10px,10px -10px,-10px 0; }
+  .frame img { max-width: 100%; max-height: 100%; border-radius: 16px; display: block; }
+
+  /* states */
+  .state { text-align: center; padding: 10px 0 0; min-height: 24px; }
+  .state[hidden] { display: none; }
+  .spinner { width: 26px; height: 26px; border-radius: 50%; border: 4px solid var(--mint); border-top-color: var(--primary); animation: spin .8s linear infinite; margin: 0 auto 10px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .state .msg { font-size: .95rem; color: var(--muted); }
+  .state.error .msg { color: var(--danger); font-family: var(--font-round); font-weight: 700; }
+  .track { height: 10px; border-radius: 999px; background: var(--mint-soft); box-shadow: var(--press-sm); overflow: hidden; margin: 12px auto 0; max-width: 280px; }
+  .bar { height: 100%; width: 0; background: var(--primary); border-radius: 999px; transition: width .25s ease; }
+
+  @media (prefers-reduced-motion: reduce) { *, .mascot { animation: none !important; transition: none !important; } }
+
+  /* ---------- monetization shelf ---------- */
+  .shelf-title { font-family: var(--font-round); font-weight: 800; font-size: 1.1rem; text-align: center; margin: 4px 0 16px; color: var(--muted); }
+  .tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 480px) { .tiles { grid-template-columns: 1fr; } }
+  .tile {
+    background: var(--cream); border-radius: 28px; box-shadow: var(--raise-sm); padding: 18px 18px;
+    display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink);
+    transition: transform .16s var(--spring), box-shadow .16s; outline: none;
+  }
+  .tile:hover { transform: translateY(-3px); }
+  .tile:active { box-shadow: var(--press-sm); transform: scale(.98); }
+  .tile:focus-visible { box-shadow: 0 0 0 5px rgba(31,114,79,.35), var(--raise-sm); }
+  .tile .emoji { flex: none; width: 46px; height: 46px; border-radius: 16px; background: var(--mint); box-shadow: var(--raise-sm); display: grid; place-items: center; font-size: 1.4rem; }
+  .tile.donate .emoji { background: #FFD9CE; }
+  .tile .t { font-family: var(--font-round); font-weight: 700; font-size: .98rem; display: block; }
+  .tile .d { font-size: .8rem; color: var(--muted); }
+  .tile.placeholder { border: 2px dashed var(--clay-dark); box-shadow: none; opacity: .8; }
+  .tile.placeholder .emoji { background: var(--mint-soft); }
+
+  .ad-slot { margin: 20px 0 6px; }
+  .ad-frame { border-radius: 26px; background: var(--mint-soft); box-shadow: var(--press-sm); padding: 14px; text-align: center; }
+  .ad-frame .lbl { font-family: var(--font-round); font-weight: 700; font-size: .7rem; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; }
+  .ad-frame .placeholder-note { color: var(--muted); font-size: .82rem; }
+
+  /* pro controls */
+  .pro[hidden] { display: none; }
+  .pro { margin-top: 22px; padding-top: 20px; border-top: 2px dashed var(--clay-dark); }
+  .bg-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .swatch { width: 44px; height: 44px; border-radius: 14px; cursor: pointer; box-shadow: var(--raise-sm); border: none; outline: none; }
+  .swatch:focus-visible { box-shadow: 0 0 0 5px rgba(31,114,79,.35), var(--raise-sm); }
+  .swatch.active { box-shadow: var(--press-sm); }
+
+  /* export quality segmented control */
+  .quality { margin-top: 20px; }
+  .q-head { display: flex; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+  .q-title { font-family: var(--font-round); font-weight: 700; font-size: .95rem; }
+  .q-dim { font-size: .82rem; color: var(--muted); }
+  .seg { display: flex; gap: 8px; background: var(--mint-soft); border-radius: 999px; padding: 6px; box-shadow: var(--press-sm); }
+  .seg-btn { flex: 1; font-family: var(--font-round); font-weight: 700; font-size: .85rem; border: none; cursor: pointer;
+    padding: 11px 12px; border-radius: 999px; background: transparent; color: var(--muted); outline: none;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: background .16s, color .16s, box-shadow .16s; }
+  .seg-btn.active { background: var(--cream); color: var(--ink); box-shadow: var(--raise-sm); }
+  .seg-btn:focus-visible { box-shadow: 0 0 0 4px rgba(31,114,79,.35); }
+  .seg-btn.locked { color: var(--gold-ink); }
+  .q-note { font-size: .78rem; color: var(--muted); margin: 10px 2px 0; line-height: 1.45; }
+
+  /* batch grid (Pro) */
+  .batch-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .batch-item { position: relative; border-radius: 20px; background: var(--mint-soft); box-shadow: var(--press-sm); padding: 6px; aspect-ratio: 1/1; overflow: hidden; }
+  .batch-item.alpha { background-color: #DBEFE1; background-image:
+      linear-gradient(45deg,#BFE3CB 25%,transparent 25%),linear-gradient(-45deg,#BFE3CB 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#BFE3CB 75%),linear-gradient(-45deg,transparent 75%,#BFE3CB 75%);
+    background-size: 14px 14px; background-position: 0 0,0 7px,7px -7px,-7px 0; }
+  .batch-item img { width: 100%; height: 100%; object-fit: contain; border-radius: 14px; display: block; }
+  .batch-item .b-badge { position: absolute; left: 6px; bottom: 6px; font-family: var(--font-round); font-weight: 700; font-size: .62rem;
+    padding: 3px 7px; border-radius: 999px; background: rgba(242,251,243,.85); color: var(--muted); }
+  .batch-item.done .b-badge { color: var(--primary); }
+  .batch-item .b-spin { position: absolute; inset: 0; display: grid; place-items: center; }
+  .batch-item .b-spin .spinner { width: 20px; height: 20px; margin: 0; }
+
+  /* modal (glass, floats) */
+  .overlay { position: fixed; inset: 0; z-index: 50; background: rgba(18,53,42,.34); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: grid; place-items: center; padding: 20px; }
+  .overlay[hidden] { display: none; }
+  .modal { position: relative; width: 100%; max-width: 430px; background: rgba(242,251,243,.7);
+    backdrop-filter: blur(26px) saturate(150%); -webkit-backdrop-filter: blur(26px) saturate(150%);
+    border: 1px solid rgba(255,255,255,.75); border-radius: 34px; box-shadow: 0 26px 64px rgba(18,53,42,.4); padding: 30px; }
+  .modal h2 { display: flex; align-items: center; gap: 10px; }
+  .price { font-family: var(--font-round); font-size: 2.2rem; font-weight: 800; margin: 6px 0 2px; }
+  .price small { font-size: .95rem; font-weight: 600; color: var(--muted); }
+  .feat { list-style: none; padding: 0; margin: 18px 0 22px; }
+  .feat li { display: flex; gap: 10px; padding: 7px 0; font-size: .97rem; align-items: flex-start; }
+  .feat li svg { width: 21px; height: 21px; stroke: var(--primary); flex: none; margin-top: 1px; }
+  .m-close { position: absolute; top: 18px; right: 18px; width: 42px; height: 42px; padding: 0; }
+  .note { font-size: .76rem; color: var(--muted); text-align: center; margin-top: 14px; line-height: 1.45; }
+  .chip-gold { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 999px; background: var(--gold); color: var(--gold-ink); font-family: var(--font-round); font-weight: 700; font-size: .72rem; }
+
+  .toast { position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%) translateY(20px);
+    background: rgba(242,251,243,.75); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgba(255,255,255,.8); box-shadow: 0 16px 42px rgba(18,53,42,.34);
+    border-radius: 999px; padding: 13px 22px; font-family: var(--font-round); font-weight: 700; font-size: .92rem;
+    display: flex; align-items: center; gap: 8px; opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s var(--spring); z-index: 60; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast svg { width: 19px; height: 19px; stroke: var(--primary); }
+
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 10px; line-height: 1.5; }
+  footer a { color: var(--primary); font-weight: 600; }
+  .privacy { max-width: 440px; margin: 0 auto 12px; text-align: left; background: var(--cream); border-radius: 20px; box-shadow: var(--raise-sm); overflow: hidden; }
+  .privacy summary { font-family: var(--font-round); font-weight: 700; color: var(--primary); cursor: pointer; padding: 13px 18px; list-style: none; outline: none; }
+  .privacy summary::-webkit-details-marker { display: none; }
+  .privacy summary::after { content: "＋"; float: right; transition: transform .2s var(--spring); }
+  .privacy[open] summary::after { transform: rotate(45deg); }
+  .privacy summary:focus-visible { box-shadow: inset 0 0 0 3px rgba(31,114,79,.35); }
+  .privacy p { margin: 0; padding: 0 18px 16px; color: var(--muted); font-size: .82rem; }
+</style>
+</head>
+<body>
+  <div class="bg-blob a"></div>
+  <div class="bg-blob b"></div>
+
+  <main class="app">
+    <div class="top">
+      <div class="brand">
+        <img src="logo.svg" alt="AllRemover" />
+        <div class="name">All<span>Remover</span></div>
+      </div>
+      <div class="free-tag">GRATIS</div>
+    </div>
+
+    <section class="hero">
+      <div class="mascot" aria-hidden="true">
+        <!-- friendly blob lifted clean out of a scene, same character as the logo -->
+        <svg viewBox="0 0 120 120" fill="none">
+          <ellipse cx="60" cy="99" rx="33" ry="8" fill="#1F724F" opacity=".16"/>
+          <path d="M34 74c0-22 12-38 26-38s26 16 26 38c0 9-12 13-26 13S34 83 34 74Z" fill="#EAFBEF"/>
+          <circle cx="60" cy="46" r="20" fill="#EAFBEF"/>
+          <circle cx="53" cy="44" r="4" fill="#12352A"/>
+          <circle cx="67" cy="44" r="4" fill="#12352A"/>
+          <circle cx="54.3" cy="42.7" r="1.4" fill="#fff"/>
+          <circle cx="68.3" cy="42.7" r="1.4" fill="#fff"/>
+          <path d="M53 53q7 6 14 0" stroke="#12352A" stroke-width="2.6" stroke-linecap="round"/>
+          <circle cx="46" cy="52" r="3" fill="#E76F51" opacity=".5"/>
+          <circle cx="74" cy="52" r="3" fill="#E76F51" opacity=".5"/>
+          <circle cx="94" cy="30" r="11" fill="#E76F51"/>
+          <path d="M94 25v10M89 30h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" transform="rotate(45 94 30)"/>
+        </svg>
+      </div>
+      <h1>Buang background,<br>langsung jadi.</h1>
+      <p>Gratis, jalan di HP kamu. Gak upload, gak daftar.</p>
+    </section>
+
+    <!-- Tool card -->
+    <section class="card" aria-labelledby="up-h">
+      <h2 id="up-h">Taruh fotonya di sini</h2>
+      <div id="tray" class="tray" role="button" tabindex="0" aria-label="Pilih atau jatuhkan gambar untuk dihapus backgroundnya">
+        <div class="ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/>
+          </svg>
+        </div>
+        <div class="big">Ketuk buat pilih foto</div>
+        <div class="small">atau seret ke sini. JPG / PNG / WEBP · bisa banyak sekaligus (PRO)</div>
+      </div>
+      <input id="file" type="file" accept="image/png,image/jpeg,image/webp" multiple class="visually-hidden" />
+
+      <div class="actions">
+        <button id="run" class="btn btn-primary" disabled>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/></svg>
+          Hapus Background
+        </button>
+        <button id="reset" class="btn" disabled>Ulang</button>
+      </div>
+
+      <div id="state-empty" class="state"><p class="msg">Belum ada foto, pilih dulu ya.</p></div>
+      <div id="state-loading" class="state" hidden aria-live="polite">
+        <div class="spinner" aria-hidden="true"></div>
+        <p class="msg" id="loading-msg">Lagi ngerjain...</p>
+        <div class="track"><div class="bar" id="bar"></div></div>
+      </div>
+      <div id="state-error" class="state error" hidden aria-live="assertive"><p class="msg" id="error-msg">Waduh, gagal.</p></div>
+    </section>
+
+    <!-- Result -->
+    <section class="card" id="result-panel" aria-labelledby="res-h" hidden>
+      <h2 id="res-h">Nih hasilnya</h2>
+      <div class="previews">
+        <div class="shot"><div class="cap">Sebelum</div><div class="frame"><img id="img-before" alt="Foto asli sebelum diproses" /></div></div>
+        <div class="shot"><div class="cap">Sesudah</div><div class="frame alpha"><img id="img-after" alt="Foto tanpa background" /></div></div>
+      </div>
+      <div class="actions">
+        <button id="download" class="btn btn-primary btn-full">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
+          Download PNG
+        </button>
+      </div>
+
+      <!-- export quality: free is capped, Pro is full-res. Honest, always visible. -->
+      <div class="quality" role="group" aria-labelledby="q-h">
+        <div class="q-head">
+          <span id="q-h" class="q-title">Ukuran export</span>
+          <span id="q-dim" class="q-dim"></span>
+        </div>
+        <div class="seg">
+          <button class="seg-btn active" id="q-std" data-q="std">Standar (maks 1500px)</button>
+          <button class="seg-btn locked" id="q-hd" data-q="hd" aria-describedby="q-note">
+            HD full-res <span class="chip-gold">PRO</span>
+          </button>
+        </div>
+        <p id="q-note" class="q-note">Versi gratis dikecilin biar ringan. HD full-res kebuka di Pro.</p>
+      </div>
+
+      <div class="pro" id="pro-controls" hidden>
+        <h2 style="font-size:1.05rem;">Ganti background <span class="chip-gold">PRO</span></h2>
+        <div class="bg-row" role="group" aria-label="Pilih warna background">
+          <button class="swatch active" style="background:var(--mint-soft)" data-bg="transparent" aria-label="Transparan"></button>
+          <button class="swatch" style="background:#FFFFFF" data-bg="#FFFFFF" aria-label="Putih"></button>
+          <button class="swatch" style="background:#12352A" data-bg="#12352A" aria-label="Gelap"></button>
+          <button class="swatch" style="background:#1F724F" data-bg="#1F724F" aria-label="Hijau"></button>
+          <button class="swatch" style="background:#E76F51" data-bg="#E76F51" aria-label="Coral"></button>
+          <label class="swatch" style="background:linear-gradient(135deg,#ffd6a5,#a5d8ff);display:grid;place-items:center;position:relative;overflow:hidden" title="Warna bebas">
+            <input type="color" id="custom-bg" value="#ffd6a5" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer" aria-label="Warna bebas" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12352A" stroke-width="2.4" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <!-- Batch (Pro): many photos at once -->
+    <section class="card" id="batch-panel" aria-labelledby="batch-h" hidden>
+      <h2 id="batch-h">Antrian foto <span class="chip-gold">PRO</span></h2>
+      <div id="batch-grid" class="batch-grid"></div>
+      <div class="actions">
+        <button id="batch-run" class="btn btn-primary">Proses semua</button>
+        <button id="batch-zip" class="btn" disabled>Download semua (ZIP)</button>
+        <button id="batch-clear" class="btn">Kosongin</button>
+      </div>
+      <p id="batch-status" class="q-note" aria-live="polite"></p>
+    </section>
+
+    <!-- Premium teaser -->
+    <section class="card" style="display:flex;align-items:center;gap:16px;" aria-labelledby="prem-h">
+      <div style="flex:none;width:56px;height:56px;border-radius:18px;background:linear-gradient(145deg,#f3d27f,#dcae46);box-shadow:var(--raise-sm);display:grid;place-items:center;" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--gold-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 2 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8z"/></svg>
+      </div>
+      <div style="flex:1;">
+        <b id="prem-h" style="font-family:var(--font-round);font-size:1.05rem;display:block;">AllRemover Pro</b>
+        <span style="font-size:.86rem;color:var(--muted);">Ganti background, export HD, banyak foto sekaligus.</span>
+      </div>
+      <button id="open-premium" class="btn btn-gold">Lihat</button>
+    </section>
+
+    <!-- Monetization shelf: donate + ads + affiliate. Honest, config-driven. -->
+    <section aria-labelledby="support-h">
+      <p class="shelf-title" id="support-h">Bantu AllRemover tetap gratis</p>
+
+      <div id="ad-slot" class="ad-slot"></div>
+
+      <div id="tiles" class="tiles"></div>
+    </section>
+
+    <footer>
+      <details class="privacy">
+        <summary>Privasi &amp; cara kerja</summary>
+        <p>Foto kamu diproses langsung di browser pakai AI on-device, jadi
+        gambarnya <b>gak pernah dikirim ke server</b> mana pun. Yang butuh
+        internet cuma sekali download mesin AI di awal. Iklan di halaman ini
+        dimuat dari jaringan iklan pihak ketiga (skrip mereka bisa pasang
+        cookie sesuai kebijakan mereka), tapi itu terpisah dari foto kamu.</p>
+      </details>
+      AllRemover · dibikin jalan offline di browser kamu.
+    </footer>
+  </main>
+
+  <!-- Premium modal -->
+  <div id="overlay" class="overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
+      <button id="modal-close" class="btn m-close" aria-label="Tutup">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <h2 id="modal-title">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8z"/></svg>
+        AllRemover Pro
+      </h2>
+      <div class="price">Rp0 <small>/ demo</small></div>
+      <ul class="feat">
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Export HD full-res, gak dikecilin</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Proses banyak foto sekaligus + download ZIP</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ganti background jadi warna apa aja</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Tanpa iklan, selamanya</li>
+      </ul>
+      <button id="unlock" class="btn btn-gold btn-full">Coba Pro (demo)</button>
+      <p class="note">Ini demo. Pembayaran belum disambungkan, jadi tombol ini cuma buka fitur Pro buat kamu coba di perangkat ini.</p>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    <span id="toast-msg">Beres!</span>
+  </div>
+
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

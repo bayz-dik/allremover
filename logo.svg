@@ -1,0 +1,74 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="AllRemover logo">
+  <defs>
+    <!-- clay body: light top-left sheen into deep bottom-right, the moulded look -->
+    <linearGradient id="clay" x1="96" y1="72" x2="420" y2="452" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7FCB99"/>
+      <stop offset="0.5" stop-color="#2E9366"/>
+      <stop offset="1" stop-color="#1B6A49"/>
+    </linearGradient>
+    <!-- the mascot's own body gradient, echoing the hero blob -->
+    <linearGradient id="blob" x1="180" y1="150" x2="330" y2="360" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#EAFBEF"/>
+      <stop offset="1" stop-color="#B7E5BA"/>
+    </linearGradient>
+    <radialGradient id="sheen" cx="0.32" cy="0.26" r="0.85">
+      <stop stop-color="#FFFFFF" stop-opacity="0.6"/>
+      <stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <!-- transparency checker = the background that got removed -->
+    <pattern id="checker" width="52" height="52" patternUnits="userSpaceOnUse">
+      <rect width="52" height="52" fill="#D3ECDA"/>
+      <rect width="26" height="26" fill="#BADFC6"/>
+      <rect x="26" y="26" width="26" height="26" fill="#BADFC6"/>
+    </pattern>
+    <filter id="drop" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="20" stdDeviation="22" flood-color="#12503A" flood-opacity="0.34"/>
+    </filter>
+    <filter id="lift" x="-60%" y="-60%" width="220%" height="220%">
+      <feDropShadow dx="0" dy="26" stdDeviation="20" flood-color="#0E3D2B" flood-opacity="0.30"/>
+    </filter>
+    <clipPath id="round"><rect x="64" y="64" width="384" height="384" rx="112"/></clipPath>
+  </defs>
+
+  <!-- clay rounded-square body -->
+  <g filter="url(#drop)">
+    <rect x="64" y="64" width="384" height="384" rx="112" fill="url(#clay)"/>
+  </g>
+
+  <!-- checker scene sitting inside the tile: the "before" that gets cut away -->
+  <g clip-path="url(#round)">
+    <rect x="64" y="248" width="384" height="200" fill="url(#checker)" opacity="0.85"/>
+    <!-- a torn edge where the subject was lifted out, so the checker reads as "removed" -->
+    <path d="M64 300 q52 -34 104 0 t104 0 t104 0 t80 -6 V248 H64 Z" fill="url(#clay)"/>
+  </g>
+
+  <!-- top-left clay sheen -->
+  <rect x="64" y="64" width="384" height="384" rx="112" fill="url(#sheen)"/>
+
+  <!-- the mascot, lifted clean out of the scene: same friendly blob as the hero -->
+  <g filter="url(#lift)" transform="rotate(-6 256 232)">
+    <!-- body -->
+    <path d="M168 300c0-70 40-118 88-118s88 48 88 118c0 30-40 42-88 42s-88-12-88-42Z" fill="url(#blob)"/>
+    <!-- head -->
+    <circle cx="256" cy="196" r="62" fill="url(#blob)"/>
+    <!-- face: two eyes + a happy curve, the "nagih" friendly beat -->
+    <circle cx="234" cy="190" r="12" fill="#123B2B"/>
+    <circle cx="278" cy="190" r="12" fill="#123B2B"/>
+    <circle cx="238" cy="186" r="4" fill="#FFFFFF"/>
+    <circle cx="282" cy="186" r="4" fill="#FFFFFF"/>
+    <path d="M232 220q24 20 48 0" stroke="#123B2B" stroke-width="8" stroke-linecap="round" fill="none"/>
+    <!-- cheeks -->
+    <circle cx="212" cy="210" r="9" fill="#E76F51" opacity="0.5"/>
+    <circle cx="300" cy="210" r="9" fill="#E76F51" opacity="0.5"/>
+  </g>
+
+  <!-- one deliberate coral accent: the magic-cut spark -->
+  <g filter="url(#drop)">
+    <circle cx="366" cy="150" r="40" fill="#E76F51"/>
+  </g>
+  <g transform="rotate(45 366 150)">
+    <path d="M366 128v44M344 150h44" stroke="#FFFFFF" stroke-width="8.5" stroke-linecap="round"/>
+  </g>
+  <circle cx="330" cy="118" r="7" fill="#FFFFFF" opacity="0.9"/>
+  <circle cx="398" cy="182" r="5" fill="#FFFFFF" opacity="0.75"/>
+</svg>
