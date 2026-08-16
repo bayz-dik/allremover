@@ -16,12 +16,10 @@ window.ALLREMOVER_CONFIG = {
 
   // Adsterra: create a "Banner" ad unit, copy its script src (the //...invoke.js
   // URL) and the key from the snippet. Leave blank to show an honest slot.
-  // TEMPORARILY OFF: old account served adult/gambling ads. Re-enable with a
-  // fresh Mainstream/Non-adult account + new Banner unit (paste key + scriptSrc).
   adsterra: {
-    enabled: false,
-    key: "1aaca550f057b7d50d2671cf8a18a37b",
-    scriptSrc: "https://www.highperformanceformat.com/1aaca550f057b7d50d2671cf8a18a37b/invoke.js",
+    enabled: true,
+    key: "847105f43e5df15dc0ca2d0154349ecc",
+    scriptSrc: "https://www.highperformanceformat.com/847105f43e5df15dc0ca2d0154349ecc/invoke.js",
     width: 320,
     height: 50
   },
