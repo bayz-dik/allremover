@@ -42,8 +42,32 @@ export async function watchAuth(cb) {
 export async function loginWithGoogle() {
   const { auth, authMod } = await ensureFirebase();
   const provider = new authMod.GoogleAuthProvider();
-  const { user } = await authMod.signInWithPopup(auth, provider);
-  return user;
+  // Popups are unreliable on mobile browsers (often silently blocked), so try
+  // popup first and fall back to a full-page redirect when it fails.
+  try {
+    const { user } = await authMod.signInWithPopup(auth, provider);
+    return user;
+  } catch (e) {
+    const code = e && e.code;
+    if (code === "auth/popup-blocked" || code === "auth/popup-closed-by-user" ||
+        code === "auth/cancelled-popup-request" || code === "auth/operation-not-supported-in-this-environment") {
+      await authMod.signInWithRedirect(auth, provider); // returns via getRedirectResult on reload
+      return null;
+    }
+    throw e;
+  }
+}
+
+// Call once on load: completes a redirect-based sign-in if one is pending.
+export async function completeRedirectLogin() {
+  const { auth, authMod } = await ensureFirebase();
+  try {
+    const res = await authMod.getRedirectResult(auth);
+    return res && res.user ? res.user : null;
+  } catch (e) {
+    console.warn("redirect login result error", e);
+    return null;
+  }
 }
 
 export async function logout() {

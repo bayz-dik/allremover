@@ -403,11 +403,15 @@ async function refreshProForUser(user) {
 if (loginBtn) loginBtn.addEventListener("click", async () => {
   loginBtn.disabled = true;
   try {
+    try { localStorage.setItem("allremover_signedin", "1"); } catch (e) {}
     const { loginWithGoogle } = await import("./firebase-pro.js");
     const user = await loginWithGoogle();
-    await refreshProForUser(user);
+    // user is null when we fell back to redirect; the page will reload and
+    // completeRedirectLogin() picks it up. Otherwise it's an immediate popup login.
+    if (user) await refreshProForUser(user);
   } catch (e) {
-    if (e && e.code !== "auth/popup-closed-by-user") { console.error(e); showToast("Sign-in failed"); }
+    console.error("sign-in error", e);
+    showToast("Sign-in failed: " + (e && e.code ? e.code : "unknown"));
   } finally { loginBtn.disabled = false; }
 });
 
@@ -435,18 +439,16 @@ if (subscribeBtn) subscribeBtn.addEventListener("click", () => {
 // sign-in flag is set, so first-time/free visitors stay Firebase-free.
 try {
   if (localStorage.getItem("allremover_signedin") === "1") {
-    import("./firebase-pro.js").then(({ watchAuth }) =>
+    import("./firebase-pro.js").then(async ({ watchAuth, completeRedirectLogin }) => {
+      // finish a pending mobile redirect sign-in, if any
+      await completeRedirectLogin();
       watchAuth((user) => {
         if (user) { localStorage.setItem("allremover_signedin", "1"); refreshProForUser(user); }
         else { localStorage.removeItem("allremover_signedin"); showProState("auth"); }
-      })
-    );
+      });
+    });
   }
 } catch (e) {}
-// Also set the flag the moment a login succeeds, so future visits auto-resume.
-if (loginBtn) loginBtn.addEventListener("click", () => {
-  try { localStorage.setItem("allremover_signedin", "1"); } catch (e) {}
-});
 
 // ---------- pro background swatches ----------
 document.querySelectorAll(".swatch[data-bg]").forEach(sw => sw.addEventListener("click", () => {
