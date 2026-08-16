@@ -3,6 +3,10 @@
 // tool never pays the cost of the Firebase SDK. The config below is public by
 // design; real security lives in Firestore Rules (client can read only its own
 // user doc, and can never write Pro status — only our server may).
+//
+// We load Firebase from Google's official gstatic CDN (not esm.sh): it's the
+// supported way to use the modular SDK straight in the browser and is far more
+// reliable for a package as large as Firebase.
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDdOUB7nhZtj8vgXKO0tKslVv61jocTwOU",
   authDomain: "allremover.firebaseapp.com",
@@ -12,16 +16,17 @@ const FIREBASE_CONFIG = {
   appId: "1:80802162662:web:1a8c53ef36e482304b9827"
 };
 
-const SDK = "https://esm.sh/firebase@10.12.2";
+const V = "10.12.2";
+const CDN = `https://www.gstatic.com/firebasejs/${V}`;
 let _fb = null;
 
 // One-time SDK load + init. Returns the handles we need.
 async function ensureFirebase() {
   if (_fb) return _fb;
   const [appMod, authMod, fsMod] = await Promise.all([
-    import(`${SDK}/app`),
-    import(`${SDK}/auth`),
-    import(`${SDK}/firestore`),
+    import(`${CDN}/firebase-app.js`),
+    import(`${CDN}/firebase-auth.js`),
+    import(`${CDN}/firebase-firestore.js`),
   ]);
   const app = appMod.initializeApp(FIREBASE_CONFIG);
   _fb = {

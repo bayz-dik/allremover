@@ -411,7 +411,7 @@ if (loginBtn) loginBtn.addEventListener("click", async () => {
     if (user) await refreshProForUser(user);
   } catch (e) {
     console.error("sign-in error", e);
-    showToast("Sign-in failed: " + (e && e.code ? e.code : "unknown"));
+    showToast("Sign-in failed: " + (e && (e.code || e.message) ? (e.code || e.message) : "unknown"));
   } finally { loginBtn.disabled = false; }
 });
 
