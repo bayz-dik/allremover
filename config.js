@@ -26,10 +26,13 @@ window.ALLREMOVER_CONFIG = {
 
   // --- Google AdSense. Needs an approved account + your live domain. ---
   // Get these from your AdSense dashboard after approval.
+  // NOTE: the site-level verification script is already in each page's <head>.
+  // This block controls per-slot ad units and stays OFF until approval + a real
+  // ad-unit slot id exists, so no empty AdSense box shows during review.
   adsense: {
     enabled: false,
-    client: "",   // e.g. "ca-pub-1234567890123456"
-    slot: ""      // e.g. "1234567890"  (an ad unit's slot id)
+    client: "ca-pub-5464409439309670",
+    slot: ""      // e.g. "1234567890"  (fill after creating an ad unit)
   },
 
   // --- Affiliate links. Each entry is a clay tile. Leave `url` empty to show
