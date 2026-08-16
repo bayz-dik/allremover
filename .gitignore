@@ -10,3 +10,10 @@ Thumbs.db
 # local dev
 .cache/
 *.tmp
+
+# secrets — never commit service accounts or env files
+.env
+.env.*
+*serviceAccount*.json
+service-account*.json
+firebase-adminsdk*.json

@@ -427,12 +427,48 @@ async function doLogout() {
 if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
 if (logoutActiveBtn) logoutActiveBtn.addEventListener("click", doLogout);
 
-// Payment wiring comes next (Midtrans). For now the subscribe button is a
-// clearly-labeled placeholder so the flow is testable end-to-end without
-// charging anyone.
-if (subscribeBtn) subscribeBtn.addEventListener("click", () => {
-  showToast("Payment coming soon");
+// Payment: create a Midtrans transaction on our server, then open Snap. On a
+// successful payment the webhook writes proUntil to Firestore; we re-check and
+// unlock. Snap is loaded via the script tag in index.html (window.snap).
+if (subscribeBtn) subscribeBtn.addEventListener("click", async () => {
+  if (!currentUser) { showToast("Please sign in first"); return; }
+  if (typeof window.snap === "undefined") { showToast("Payment not ready, reload the page"); return; }
+  subscribeBtn.disabled = true;
+  const prev = subscribeBtn.textContent;
+  subscribeBtn.textContent = "Opening payment...";
+  try {
+    const r = await fetch("/api/create-transaction", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ uid: currentUser.uid, email: currentUser.email }),
+    });
+    const data = await r.json();
+    if (!r.ok || !data.token) { throw new Error(data.error || "Failed to start payment"); }
+    window.snap.pay(data.token, {
+      onSuccess: () => { showToast("Payment received! Unlocking Pro..."); recheckProSoon(); },
+      onPending: () => { showToast("Payment pending. Pro unlocks once it's confirmed."); },
+      onError: () => { showToast("Payment failed"); },
+      onClose: () => { /* user dismissed the popup */ },
+    });
+  } catch (e) {
+    console.error(e); showToast("Couldn't start payment: " + (e.message || "error"));
+  } finally { subscribeBtn.disabled = false; subscribeBtn.textContent = prev; }
 });
+
+// After a payment, the webhook may take a few seconds to write Firestore.
+// Poll getProUntil a few times before giving up.
+async function recheckProSoon() {
+  if (!currentUser) return;
+  const { getProUntil } = await import("./firebase-pro.js");
+  for (let i = 0; i < 6; i++) {
+    await new Promise(r => setTimeout(r, 2500));
+    try {
+      const until = await getProUntil(currentUser.uid);
+      if (until) { await refreshProForUser(currentUser); showToast("Pro unlocked!"); return; }
+    } catch (e) { /* keep trying */ }
+  }
+  showToast("Payment confirmed. If Pro isn't on yet, reload in a moment.");
+}
 
 // On load, if the user signed in before, Firebase restores the session. We
 // check quietly WITHOUT forcing the SDK on free users: only resume if a prior

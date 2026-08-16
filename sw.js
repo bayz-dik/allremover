@@ -7,7 +7,7 @@
 // and safe to cache. They live in a separate, un-versioned bucket so a shell
 // bump doesn't force a multi-MB model re-download. Both are immutable, versioned
 // URLs, so cache-first is correct: once cached, never re-fetch.
-const CACHE = "allremover-v14";
+const CACHE = "allremover-v15";
 const ENGINE_CACHE = "allremover-engine-v1";
 // hosts that serve the immutable engine + model + Firebase SDK assets
 const ENGINE_HOSTS = ["esm.sh", "staticimgly.com", "www.gstatic.com"];
@@ -71,6 +71,9 @@ self.addEventListener("fetch", (e) => {
   }
 
   if (url.origin !== location.origin) return; // other cross-origin (ads) hit network
+
+  // never cache API calls (payment) — always hit the network
+  if (url.pathname.startsWith("/api/")) return;
 
   // cache-first for the shell, fall back to network and cache fresh GETs
   e.respondWith(
