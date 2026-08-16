@@ -12,7 +12,7 @@ const resultPanel = $("result-panel"), imgBefore = $("img-before"), imgAfter = $
 const cmpAfterWrap = $("cmp-after-wrap"), cmpRange = $("cmp-range");
 const downloadBtn = $("download"), shareBtn = $("share");
 const overlay = $("overlay"), modal = $("modal"), openPremium = $("open-premium");
-const modalClose = $("modal-close"), unlockBtn = $("unlock");
+const modalClose = $("modal-close");
 const proControls = $("pro-controls");
 const toast = $("toast"), toastMsg = $("toast-msg");
 // quality + batch
@@ -364,16 +364,88 @@ function applyPro() {
   qHd.classList.remove("locked");
   qNote.textContent = "Pro's on. Pick HD for full-res export, or drop a bunch of photos in the tray at once.";
 }
-// Persist the demo unlock so a reload doesn't silently drop Pro (the modal
-// promises it stays unlocked "on this device"). localStorage may throw in
-// private mode, so guard it.
-try { if (localStorage.getItem("allremover_pro") === "1") applyPro(); } catch (e) {}
-unlockBtn.addEventListener("click", () => {
-  applyPro();
-  try { localStorage.setItem("allremover_pro", "1"); } catch (e) {}
-  closeModal();
-  showToast("Pro unlocked (demo)");
-  if (!resultPanel.hidden) proControls.scrollIntoView({ behavior: "smooth", block: "nearest" });
+
+// ================= PRO via Firebase Auth + Firestore =================
+// Free tier never touches Firebase. We only load it when the user opens the
+// Pro modal (or is already signed in on a returning visit — see below). Pro
+// state comes from the server-written `proUntil`, so it can't be faked client
+// side and it follows the account across devices.
+const proAuthBox = $("pro-auth"), proSubBox = $("pro-subscribe"), proActiveBox = $("pro-active");
+const loginBtn = $("login-google"), subscribeBtn = $("subscribe");
+const logoutBtn = $("logout"), logoutActiveBtn = $("logout-active");
+const proAccount = $("pro-account"), proActiveMsg = $("pro-active-msg");
+let currentUser = null;
+
+function showProState(which) {
+  if (proAuthBox) proAuthBox.hidden = which !== "auth";
+  if (proSubBox) proSubBox.hidden = which !== "subscribe";
+  if (proActiveBox) proActiveBox.hidden = which !== "active";
+}
+
+// Reflect a signed-in user + their subscription in the modal and the app.
+async function refreshProForUser(user) {
+  currentUser = user;
+  if (!user) { showProState("auth"); return; }
+  const { getProUntil } = await import("./firebase-pro.js");
+  let until = null;
+  try { until = await getProUntil(user.uid); } catch (e) { console.warn("Pro check failed", e); }
+  if (until) {
+    applyPro();
+    const d = until.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+    if (proActiveMsg) proActiveMsg.textContent = `Pro is active until ${d}.`;
+    showProState("active");
+  } else {
+    if (proAccount) proAccount.textContent = `Signed in as ${user.email}`;
+    showProState("subscribe");
+  }
+}
+
+if (loginBtn) loginBtn.addEventListener("click", async () => {
+  loginBtn.disabled = true;
+  try {
+    const { loginWithGoogle } = await import("./firebase-pro.js");
+    const user = await loginWithGoogle();
+    await refreshProForUser(user);
+  } catch (e) {
+    if (e && e.code !== "auth/popup-closed-by-user") { console.error(e); showToast("Sign-in failed"); }
+  } finally { loginBtn.disabled = false; }
+});
+
+async function doLogout() {
+  try {
+    const { logout } = await import("./firebase-pro.js");
+    await logout();
+  } catch (e) { console.error(e); }
+  currentUser = null;
+  showProState("auth");
+  showToast("Signed out");
+}
+if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
+if (logoutActiveBtn) logoutActiveBtn.addEventListener("click", doLogout);
+
+// Payment wiring comes next (Midtrans). For now the subscribe button is a
+// clearly-labeled placeholder so the flow is testable end-to-end without
+// charging anyone.
+if (subscribeBtn) subscribeBtn.addEventListener("click", () => {
+  showToast("Payment coming soon");
+});
+
+// On load, if the user signed in before, Firebase restores the session. We
+// check quietly WITHOUT forcing the SDK on free users: only resume if a prior
+// sign-in flag is set, so first-time/free visitors stay Firebase-free.
+try {
+  if (localStorage.getItem("allremover_signedin") === "1") {
+    import("./firebase-pro.js").then(({ watchAuth }) =>
+      watchAuth((user) => {
+        if (user) { localStorage.setItem("allremover_signedin", "1"); refreshProForUser(user); }
+        else { localStorage.removeItem("allremover_signedin"); showProState("auth"); }
+      })
+    );
+  }
+} catch (e) {}
+// Also set the flag the moment a login succeeds, so future visits auto-resume.
+if (loginBtn) loginBtn.addEventListener("click", () => {
+  try { localStorage.setItem("allremover_signedin", "1"); } catch (e) {}
 });
 
 // ---------- pro background swatches ----------
