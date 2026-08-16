@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://temanbaik.web.id/sitemap.xml
