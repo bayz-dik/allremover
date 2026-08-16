@@ -25,8 +25,8 @@
 <!-- Google AdSense verification + loader -->
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5464409439309670" crossorigin="anonymous"></script>
 <!-- Per-unit AdSense slots are still gated by config.js (adsense.enabled) -->
-<!-- Midtrans Snap (sandbox). Client key is public by design. -->
-<script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="Mid-client-ejlxiAW6XNUsg2Di"></script>
+<!-- Midtrans Snap is loaded lazily by app.js when the user pays, so it never
+     blocks first render (a sync script here was blanking the page). -->
 <style>
   :root {
     --primary: #1F724F;

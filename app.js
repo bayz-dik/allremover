@@ -427,16 +427,35 @@ async function doLogout() {
 if (logoutBtn) logoutBtn.addEventListener("click", doLogout);
 if (logoutActiveBtn) logoutActiveBtn.addEventListener("click", doLogout);
 
+// Lazy-load the Midtrans Snap script the first time the user pays, so a slow or
+// blocked Snap CDN never delays or blanks first render. Resolves with window.snap.
+const SNAP_SRC = "https://app.sandbox.midtrans.com/snap/snap.js";
+const SNAP_CLIENT_KEY = "Mid-client-ejlxiAW6XNUsg2Di";
+let _snapLoad = null;
+function loadSnap() {
+  if (window.snap) return Promise.resolve(window.snap);
+  if (_snapLoad) return _snapLoad;
+  _snapLoad = new Promise((resolve, reject) => {
+    const s = document.createElement("script");
+    s.src = SNAP_SRC;
+    s.setAttribute("data-client-key", SNAP_CLIENT_KEY);
+    s.onload = () => resolve(window.snap);
+    s.onerror = () => reject(new Error("Snap failed to load"));
+    document.head.appendChild(s);
+  });
+  return _snapLoad;
+}
+
 // Payment: create a Midtrans transaction on our server, then open Snap. On a
 // successful payment the webhook writes proUntil to Firestore; we re-check and
-// unlock. Snap is loaded via the script tag in index.html (window.snap).
+// unlock.
 if (subscribeBtn) subscribeBtn.addEventListener("click", async () => {
   if (!currentUser) { showToast("Please sign in first"); return; }
-  if (typeof window.snap === "undefined") { showToast("Payment not ready, reload the page"); return; }
   subscribeBtn.disabled = true;
   const prev = subscribeBtn.textContent;
   subscribeBtn.textContent = "Opening payment...";
   try {
+    const snap = await loadSnap();
     const r = await fetch("/api/create-transaction", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -444,7 +463,7 @@ if (subscribeBtn) subscribeBtn.addEventListener("click", async () => {
     });
     const data = await r.json();
     if (!r.ok || !data.token) { throw new Error(data.error || "Failed to start payment"); }
-    window.snap.pay(data.token, {
+    snap.pay(data.token, {
       onSuccess: () => { showToast("Payment received! Unlocking Pro..."); recheckProSoon(); },
       onPending: () => { showToast("Payment pending. Pro unlocks once it's confirmed."); },
       onError: () => { showToast("Payment failed"); },
