@@ -75,14 +75,14 @@ function celebrate() {
 // ---------- file intake (single or batch) ----------
 function acceptFiles(files) {
   const imgs = Array.from(files).filter(f => f.type.startsWith("image/"));
-  if (!imgs.length) { showState("error"); errMsg.textContent = "Filenya bukan gambar. Coba JPG atau PNG."; return; }
+  if (!imgs.length) { showState("error"); errMsg.textContent = "That's not an image. Try a JPG or PNG."; return; }
 
   if (imgs.length > 1) {
     if (!isPro) {
       // free: take the first, invite to Pro for the rest. Honest, not silent.
       acceptSingle(imgs[0]);
       openModal();
-      showToast("Banyak foto sekaligus itu fitur Pro");
+      showToast("Batches are a Pro thing");
       return;
     }
     addToBatch(imgs);
@@ -96,7 +96,7 @@ function acceptSingle(file) {
   imgBefore.src = URL.createObjectURL(file);
   runBtn.disabled = false; resetBtn.disabled = false;
   showState("empty");
-  stEmpty.querySelector(".msg").textContent = "Foto siap. Tekan Hapus Background.";
+  stEmpty.querySelector(".msg").textContent = "Photo's ready. Hit Remove Background.";
   tray.querySelector(".big").textContent = file.name.length > 24 ? file.name.slice(0, 22) + "…" : file.name;
 }
 
@@ -115,11 +115,11 @@ if (trySample) trySample.addEventListener("click", async () => {
   try {
     const res = await fetch("sample.png");
     const blob = await res.blob();
-    acceptSingle(new File([blob], "contoh.png", { type: "image/png" }));
-    showToast("Contoh siap. Tekan Hapus Background");
+    acceptSingle(new File([blob], "sample.png", { type: "image/png" }));
+    showToast("Sample loaded. Hit Remove Background");
     runBtn.focus();
   } catch (e) {
-    console.error(e); showToast("Gagal muat contoh");
+    console.error(e); showToast("Couldn't load the sample");
   } finally { trySample.disabled = false; }
 });
 
@@ -128,14 +128,14 @@ runBtn.addEventListener("click", async () => {
   if (!sourceFile) return;
   runBtn.disabled = true; resetBtn.disabled = true;
   showState("loading");
-  loadingMsg.textContent = "Nyiapin mesin (sekali download aja)...";
+  loadingMsg.textContent = "Warming up the engine (one-time download)...";
   bar.style.width = "8%";
   try {
     const blob = await removeBackground(sourceFile, {
       progress: (key, current, total) => {
         const pct = total ? Math.round((current / total) * 100) : 0;
-        if (key.startsWith("fetch")) { loadingMsg.textContent = "Download mesin AI... " + pct + "%"; bar.style.width = Math.max(8, pct * 0.6) + "%"; }
-        else { loadingMsg.textContent = "Motong background... " + pct + "%"; bar.style.width = (60 + pct * 0.4) + "%"; }
+        if (key.startsWith("fetch")) { loadingMsg.textContent = "Downloading AI engine... " + pct + "%"; bar.style.width = Math.max(8, pct * 0.6) + "%"; }
+        else { loadingMsg.textContent = "Cutting out the background... " + pct + "%"; bar.style.width = (60 + pct * 0.4) + "%"; }
       }
     });
     bar.style.width = "100%";
@@ -148,14 +148,14 @@ runBtn.addEventListener("click", async () => {
     reveal(resultPanel);
     updateShareAvail();
     showState("empty");
-    stEmpty.querySelector(".msg").textContent = "Jadi! Download di bawah.";
+    stEmpty.querySelector(".msg").textContent = "Done! Grab it below.";
     resultPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-    showToast("Background kebuang!");
+    showToast("Background's gone!");
     celebrate();
   } catch (err) {
     console.error(err);
     showState("error");
-    errMsg.textContent = navigator.onLine ? "Gagal proses. Coba foto lain atau ulangi." : "Butuh internet buat download mesin AI pertama kali. Sambungin dulu ya.";
+    errMsg.textContent = navigator.onLine ? "Something went wrong. Try another photo or run it again." : "First run needs internet to grab the AI engine. Hop online and try again.";
   } finally { runBtn.disabled = false; resetBtn.disabled = false; }
 });
 
@@ -230,7 +230,7 @@ downloadBtn.addEventListener("click", async () => {
   const outURL = await composite(cutoutURL, currentBg, cap);
   const a = document.createElement("a");
   a.href = outURL; a.download = "allremover-cutout.png"; a.click();
-  showToast(quality === "hd" && isPro ? "Kesimpen (HD)" : "Kesimpen ke Download");
+  showToast(quality === "hd" && isPro ? "Saved (HD)" : "Saved to your downloads");
 });
 
 // ---------- share (Web Share API, files level) ----------
@@ -244,15 +244,17 @@ shareBtn.addEventListener("click", async () => {
   if (!cutoutBlob) return;
   shareBtn.disabled = true;
   try {
+    // exportBlob() composites from cutoutURL (the removed-bg result), never the
+    // original upload — so what gets shared is always the cut-out image.
     const blob = await exportBlob();
     const file = new File([blob], "allremover-cutout.png", { type: "image/png" });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: "AllRemover", text: "Background kebuang pakai AllRemover" });
+      await navigator.share({ files: [file], title: "AllRemover", text: "Cut this out with AllRemover" });
     } else if (navigator.share) {
-      await navigator.share({ title: "AllRemover", text: "Hapus background gratis di HP", url: location.href });
+      await navigator.share({ title: "AllRemover", text: "Free background remover, right in your browser", url: location.href });
     }
   } catch (e) {
-    if (e && e.name !== "AbortError") { console.error(e); showToast("Gagal bagikan"); }
+    if (e && e.name !== "AbortError") { console.error(e); showToast("Couldn't share"); }
   } finally { shareBtn.disabled = false; }
 });
 
@@ -265,8 +267,8 @@ resetBtn.addEventListener("click", () => {
   resultPanel.hidden = true; resultPanel.classList.remove("in");
   runBtn.disabled = true; resetBtn.disabled = true;
   showState("empty");
-  stEmpty.querySelector(".msg").textContent = "Belum ada foto, pilih dulu ya.";
-  tray.querySelector(".big").textContent = "Ketuk buat pilih foto";
+  stEmpty.querySelector(".msg").textContent = "No photo yet, pick one first.";
+  tray.querySelector(".big").textContent = "Tap to pick a photo";
 });
 
 // ================= BATCH (Pro) =================
@@ -279,19 +281,19 @@ function addToBatch(files) {
   reveal(batchPanel);
   renderBatch();
   batchPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-  showToast(files.length + " foto masuk antrian");
+  showToast(files.length + " photos queued up");
 }
 function renderBatch() {
   batchGrid.innerHTML = batch.map((it, i) => {
     const src = it.cutoutURL || it.srcURL;
     const alpha = it.status === "done" ? " alpha" : "";
-    const badge = it.status === "done" ? "✓ jadi" : it.status === "working" ? "…" : "antri";
+    const badge = it.status === "done" ? "✓ done" : it.status === "working" ? "…" : "queued";
     const spin = it.status === "working" ? `<div class="b-spin"><div class="spinner"></div></div>` : "";
     return `<div class="batch-item${alpha}" data-i="${i}"><img src="${src}" alt="${it.name}" />${spin}<span class="b-badge">${badge}</span></div>`;
   }).join("");
   const done = batch.filter(b => b.status === "done").length;
   batchZip.disabled = done === 0;
-  batchStatus.textContent = batch.length ? `${done}/${batch.length} selesai` : "";
+  batchStatus.textContent = batch.length ? `${done}/${batch.length} done` : "";
 }
 batchRun.addEventListener("click", async () => {
   if (!batch.length) return;
@@ -309,7 +311,7 @@ batchRun.addEventListener("click", async () => {
     renderBatch();
   }
   batchRun.disabled = false; batchClear.disabled = false;
-  showToast("Antrian beres!");
+  showToast("Queue's done!");
 });
 batchClear.addEventListener("click", () => {
   batch.forEach(it => { URL.revokeObjectURL(it.srcURL); if (it.cutoutURL) URL.revokeObjectURL(it.cutoutURL); });
@@ -319,7 +321,7 @@ batchZip.addEventListener("click", async () => {
   const done = batch.filter(b => b.status === "done" && b.cutoutBlob);
   if (!done.length) return;
   batchZip.disabled = true;
-  const prev = batchZip.textContent; batchZip.textContent = "Nyiapin ZIP...";
+  const prev = batchZip.textContent; batchZip.textContent = "Zipping...";
   try {
     const { default: JSZip } = await import("https://esm.sh/jszip@3.10.1");
     const zip = new JSZip();
@@ -334,9 +336,9 @@ batchZip.addEventListener("click", async () => {
     const a = document.createElement("a");
     a.href = url; a.download = "allremover-batch.zip"; a.click();
     setTimeout(() => URL.revokeObjectURL(url), 4000);
-    showToast("ZIP kesimpen");
+    showToast("ZIP saved");
   } catch (e) {
-    console.error(e); showToast("Gagal bikin ZIP");
+    console.error(e); showToast("Couldn't build the ZIP");
   } finally { batchZip.textContent = prev; batchZip.disabled = false; }
 });
 
@@ -360,17 +362,17 @@ overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(
 function applyPro() {
   isPro = true; proControls.hidden = false;
   qHd.classList.remove("locked");
-  qNote.textContent = "Pro aktif. Pilih HD buat export full-res, atau taruh banyak foto sekaligus di tray.";
+  qNote.textContent = "Pro's on. Pick HD for full-res export, or drop a bunch of photos in the tray at once.";
 }
 // Persist the demo unlock so a reload doesn't silently drop Pro (the modal
-// promises "buat kamu coba di perangkat ini"). localStorage may throw in
+// promises it stays unlocked "on this device"). localStorage may throw in
 // private mode, so guard it.
 try { if (localStorage.getItem("allremover_pro") === "1") applyPro(); } catch (e) {}
 unlockBtn.addEventListener("click", () => {
   applyPro();
   try { localStorage.setItem("allremover_pro", "1"); } catch (e) {}
   closeModal();
-  showToast("Fitur Pro kebuka (demo)");
+  showToast("Pro unlocked (demo)");
   if (!resultPanel.hidden) proControls.scrollIntoView({ behavior: "smooth", block: "nearest" });
 });
 
@@ -394,7 +396,7 @@ function isFilled(v) { return typeof v === "string" && v.trim() && !/^https:\/\/
 
 function initAds() {
   const slot = $("ad-slot");
-  if (isPro) { slot.remove(); return; }   // Pro = "tanpa iklan, selamanya"
+  if (isPro) { slot.remove(); return; }   // Pro = "no ads, ever"
 
   const at = CFG.adsterra || {}, ad = CFG.adsense || {};
 
@@ -403,7 +405,7 @@ function initAds() {
   if (at.enabled && isFilled(at.key) && isFilled(at.scriptSrc)) {
     const w = at.width || 320, h = at.height || 50;
     window.atOptions = { key: at.key, format: "iframe", height: h, width: w, params: {} };
-    slot.innerHTML = `<div class="ad-frame"><div class="lbl">Iklan</div>
+    slot.innerHTML = `<div class="ad-frame"><div class="lbl">Ad</div>
       <div id="ad-host" style="min-height:${h}px;display:grid;place-items:center"></div></div>`;
     const s = document.createElement("script");
     s.async = true; s.src = at.scriptSrc;
@@ -417,15 +419,15 @@ function initAds() {
     s.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(ad.client);
     s.crossOrigin = "anonymous";
     document.head.appendChild(s);
-    slot.innerHTML = `<div class="ad-frame"><div class="lbl">Iklan</div>
+    slot.innerHTML = `<div class="ad-frame"><div class="lbl">Ad</div>
       <ins class="adsbygoogle" style="display:block" data-ad-client="${esc(ad.client)}" data-ad-slot="${esc(ad.slot)}" data-ad-format="auto" data-full-width-responsive="true"></ins></div>`;
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch (e) { console.warn("AdSense not ready", e); }
     return;
   }
 
   if (!at.enabled && !ad.enabled) { slot.remove(); return; }
-  slot.innerHTML = `<div class="ad-frame"><div class="lbl">Slot Iklan</div>
-    <div class="placeholder-note">Slot iklan siap. Isi <code>adsterra.key</code> &amp; <code>adsterra.scriptSrc</code> di <code>config.js</code> (approval cepat), atau pakai AdSense setelah di-approve.</div></div>`;
+  slot.innerHTML = `<div class="ad-frame"><div class="lbl">Ad slot</div>
+    <div class="placeholder-note">Ad slot ready. Fill in <code>adsterra.key</code> &amp; <code>adsterra.scriptSrc</code> in <code>config.js</code> (quick approval), or use AdSense once approved.</div></div>`;
 }
 function initTiles() {
   const tiles = $("tiles"); const frags = [];
@@ -434,11 +436,11 @@ function initTiles() {
     if (isFilled(d.url)) {
       frags.push(`<a class="tile donate" href="${esc(d.url)}" target="_blank" rel="noopener">
         <span class="emoji" aria-hidden="true">☕</span>
-        <span><span class="t">${esc(d.label || "Traktir kopi")}</span><span class="d">Dukung lewat donasi</span></span></a>`);
+        <span><span class="t">${esc(d.label || "Buy me a coffee")}</span><span class="d">Chip in with a donation</span></span></a>`);
     } else {
       frags.push(`<div class="tile donate placeholder">
         <span class="emoji" aria-hidden="true">☕</span>
-        <span><span class="t">${esc(d.label || "Traktir kopi")}</span><span class="d">[isi <code>donate.url</code> di config.js]</span></span></div>`);
+        <span><span class="t">${esc(d.label || "Buy me a coffee")}</span><span class="d">[set <code>donate.url</code> in config.js]</span></span></div>`);
     }
   }
   const affs = Array.isArray(CFG.affiliates) ? CFG.affiliates : [];
@@ -446,13 +448,13 @@ function initTiles() {
     if (isFilled(a.url)) {
       frags.push(`<a class="tile" href="${esc(a.url)}" target="_blank" rel="sponsored noopener">
         <span class="emoji" aria-hidden="true">${esc(a.emoji || "🔗")}</span>
-        <span><span class="t">${esc(a.title || "Partner")}</span><span class="d">${esc(a.desc || "Link affiliate")}</span></span></a>`);
+        <span><span class="t">${esc(a.title || "Partner")}</span><span class="d">${esc(a.desc || "Affiliate link")}</span></span></a>`);
     }
   });
   if (!affs.some(a => isFilled(a.url))) {
     frags.push(`<div class="tile placeholder">
       <span class="emoji" aria-hidden="true">🔗</span>
-      <span><span class="t">Slot Affiliate</span><span class="d">[tambah di <code>affiliates</code> config.js]</span></span></div>`);
+      <span><span class="t">Affiliate slot</span><span class="d">[add one in <code>affiliates</code> in config.js]</span></span></div>`);
   }
   tiles.innerHTML = frags.join("");
 }
@@ -477,7 +479,7 @@ if (installBtn) installBtn.addEventListener("click", async () => {
 window.addEventListener("appinstalled", () => {
   deferredPrompt = null;
   if (installBtn) installBtn.hidden = true;
-  showToast("AllRemover kepasang!");
+  showToast("AllRemover installed!");
 });
 // register the service worker (offline shell). Only on https/localhost.
 if ("serviceWorker" in navigator) {

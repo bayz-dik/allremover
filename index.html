@@ -1,23 +1,23 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AllRemover, hapus background sat set</title>
-<meta name="description" content="Hapus background foto gratis, langsung di HP kamu. Gak perlu upload, gak perlu daftar." />
+<title>AllRemover — background gone in a snap</title>
+<meta name="description" content="Remove photo backgrounds for free, right on your device. No upload, no sign-up." />
 <link rel="icon" type="image/svg+xml" href="logo.svg" />
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
 <link rel="apple-touch-icon" href="favicon-180.png" />
 
 <!-- social share -->
 <meta property="og:type" content="website" />
-<meta property="og:title" content="AllRemover — hapus background sat set" />
-<meta property="og:description" content="Gratis, jalan di HP kamu. Gak upload, gak daftar, gak ada server." />
+<meta property="og:title" content="AllRemover — background gone in a snap" />
+<meta property="og:description" content="Free, runs on your device. No upload, no sign-up, no server." />
 <meta property="og:image" content="https://bayz-dik.github.io/allremover/og-image.png" />
 <meta property="og:url" content="https://bayz-dik.github.io/allremover/" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="AllRemover — hapus background sat set" />
-<meta name="twitter:description" content="Gratis, jalan di HP kamu. Gak upload, gak daftar." />
+<meta name="twitter:title" content="AllRemover — background gone in a snap" />
+<meta name="twitter:description" content="Free, runs on your device. No upload, no sign-up." />
 <meta name="twitter:image" content="https://bayz-dik.github.io/allremover/og-image.png" />
 <meta name="theme-color" content="#1F724F" />
 <link rel="manifest" href="manifest.webmanifest" />
@@ -299,13 +299,89 @@
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 10px; line-height: 1.5; }
   footer a { color: var(--primary); font-weight: 600; }
-  .privacy { max-width: 440px; margin: 0 auto 12px; text-align: left; background: var(--cream); border-radius: 20px; box-shadow: var(--raise-sm); overflow: hidden; }
-  .privacy summary { font-family: var(--font-round); font-weight: 700; color: var(--primary); cursor: pointer; padding: 13px 18px; list-style: none; outline: none; }
-  .privacy summary::-webkit-details-marker { display: none; }
-  .privacy summary::after { content: "＋"; float: right; transition: transform .2s var(--spring); }
-  .privacy[open] summary::after { transform: rotate(45deg); }
-  .privacy summary:focus-visible { box-shadow: inset 0 0 0 3px rgba(31,114,79,.35); }
-  .privacy p { margin: 0; padding: 0 18px 16px; color: var(--muted); font-size: .82rem; }
+
+  /* ============================================================
+     EXTRA MATERIAL FX — layered on top of the clay base:
+     · glass sheen (specular highlight) on raised surfaces
+     · neumorphic inner top-light for a moulded look
+     · skeuomorphic gloss on the mascot + primary key
+     · choreographed micro-motion (sheen sweep, float, shimmer)
+     All gated behind prefers-reduced-motion below.
+     ============================================================ */
+
+  /* glass specular streak that sweeps across the mascot, like light on a toy */
+  .mascot { overflow: hidden; isolation: isolate; }
+  .mascot::before {
+    content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none;
+    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,.55) 46%, rgba(255,255,255,.08) 54%, transparent 66%);
+    transform: translateX(-120%); animation: sheen 4.8s ease-in-out infinite;
+  }
+  /* soft neumorphic top-light bead on the mascot so it reads as moulded */
+  .mascot::after {
+    content: ""; position: absolute; left: 18%; top: 12%; width: 42%; height: 30%; z-index: 3;
+    border-radius: 50%; pointer-events: none;
+    background: radial-gradient(closest-side, rgba(255,255,255,.6), transparent 70%);
+  }
+  @keyframes sheen { 0%, 62% { transform: translateX(-120%); } 82%, 100% { transform: translateX(120%); } }
+
+  /* glass sheen on every clay card: a faint diagonal gloss + crisp top edge light */
+  .card { position: relative; overflow: hidden; isolation: isolate; }
+  .card::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none; border-radius: inherit;
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,0) 32%),
+      radial-gradient(120% 60% at 15% -10%, rgba(255,255,255,.35), transparent 60%);
+    mix-blend-mode: screen; opacity: .8;
+  }
+  .card > * { position: relative; z-index: 1; }
+
+  /* primary key: skeuomorphic gloss + a shimmer that sweeps on hover */
+  .btn-primary { position: relative; overflow: hidden; }
+  .btn-primary::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 48%; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.28), transparent);
+    border-radius: 999px 999px 40% 40% / 999px 999px 100% 100%;
+  }
+  .btn-primary::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(115deg, transparent 35%, rgba(255,255,255,.4) 50%, transparent 65%);
+    transform: translateX(-130%); transition: transform .6s var(--spring);
+  }
+  .btn-primary:hover::after { transform: translateX(130%); }
+
+  /* tiles + install pill get the same quiet top gloss (neumorph read) */
+  .tile, .install-btn, .btn-gold, .btn-donate { position: relative; overflow: hidden; }
+  .tile::before, .install-btn::before, .btn-gold::before, .btn-donate::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 0; height: 50%; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.3), transparent);
+  }
+
+  /* drop tray: a soft breathing glow so it invites a drop, calms on hover */
+  .tray .ic { animation: pulse 2.8s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { transform: translateY(0); box-shadow: var(--raise-sm); } 50% { transform: translateY(-3px); box-shadow: 10px 10px 22px var(--clay-dark), -10px -10px 22px var(--clay-light); } }
+  .tray:hover .ic, .tray.dragover .ic { animation-play-state: paused; }
+
+  /* the result reveal gets a one-shot glass glint when it lands */
+  .cmp-frame::after {
+    content: ""; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+    background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.35) 50%, transparent 60%);
+    transform: translateX(-130%);
+  }
+  .reveal.in .cmp-frame::after { animation: glint 1s var(--spring) .25s 1; }
+  @keyframes glint { to { transform: translateX(130%); } }
+
+  /* floating glass surfaces (modal, toast) get a top edge highlight */
+  .modal::before, .toast::before {
+    content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(180deg, rgba(255,255,255,.55), transparent 30%);
+  }
+  .modal { overflow: hidden; }
+
+  /* honor reduced motion: kill all the sweeps/pulses, keep the static highlights */
+  @media (prefers-reduced-motion: reduce) {
+    .mascot::before, .tray .ic, .btn-primary::after, .cmp-frame::after { animation: none !important; }
+    .btn-primary:hover::after { transform: translateX(-130%); }
+  }
 </style>
 </head>
 <body>
@@ -318,10 +394,10 @@
         <img src="logo.svg" alt="AllRemover" />
         <div class="name">All<span>Remover</span></div>
       </div>
-      <div class="free-tag">GRATIS</div>
+      <div class="free-tag">FREE</div>
       <button id="install" class="install-btn" type="button" hidden>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg>
-        Pasang
+        Install
       </button>
     </div>
 
@@ -343,65 +419,65 @@
           <path d="M94 25v10M89 30h10" stroke="#fff" stroke-width="2.6" stroke-linecap="round" transform="rotate(45 94 30)"/>
         </svg>
       </div>
-      <h1>Buang background,<br>langsung jadi.</h1>
-      <p>Gratis, jalan di HP kamu. Gak upload, gak daftar.</p>
+      <h1>Drop the background,<br>keep the good part.</h1>
+      <p>Free, runs on your device. No upload, no sign-up.</p>
     </section>
 
     <!-- Tool card -->
     <section class="card" aria-labelledby="up-h">
-      <h2 id="up-h">Taruh fotonya di sini</h2>
-      <div id="tray" class="tray" role="button" tabindex="0" aria-label="Pilih atau jatuhkan gambar untuk dihapus backgroundnya">
+      <h2 id="up-h">Drop your photo here</h2>
+      <div id="tray" class="tray" role="button" tabindex="0" aria-label="Pick or drop an image to remove its background">
         <div class="ic" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 9 12 4 17 9"/><line x1="12" y1="4" x2="12" y2="16"/>
           </svg>
         </div>
-        <div class="big">Ketuk buat pilih foto</div>
-        <div class="small">atau seret ke sini. JPG / PNG / WEBP · bisa banyak sekaligus (PRO)</div>
+        <div class="big">Tap to pick a photo</div>
+        <div class="small">or drag it in. JPG / PNG / WEBP · batches (PRO)</div>
       </div>
       <input id="file" type="file" accept="image/png,image/jpeg,image/webp" multiple class="visually-hidden" />
 
       <button id="try-sample" class="try-sample" type="button">
         <span class="ts-thumb"><img src="sample.png" alt="" aria-hidden="true" /></span>
-        <span class="ts-text"><b>Belum ada foto?</b> Coba pakai contoh ini →</span>
+        <span class="ts-text"><b>No photo handy?</b> Try this sample →</span>
       </button>
 
       <div class="actions">
         <button id="run" class="btn btn-primary" disabled>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3m0 12v3M5.6 5.6l2.1 2.1m8.6 8.6 2.1 2.1M3 12h3m12 0h3M5.6 18.4l2.1-2.1m8.6-8.6 2.1-2.1"/></svg>
-          Hapus Background
+          Remove Background
         </button>
-        <button id="reset" class="btn" disabled>Ulang</button>
+        <button id="reset" class="btn" disabled>Reset</button>
       </div>
 
-      <div id="state-empty" class="state"><p class="msg">Belum ada foto, pilih dulu ya.</p></div>
+      <div id="state-empty" class="state"><p class="msg">No photo yet, pick one first.</p></div>
       <div id="state-loading" class="state" hidden aria-live="polite">
         <div class="spinner" aria-hidden="true"></div>
-        <p class="msg" id="loading-msg">Lagi ngerjain...</p>
+        <p class="msg" id="loading-msg">Working on it...</p>
         <div class="track"><div class="bar" id="bar"></div></div>
       </div>
-      <div id="state-error" class="state error" hidden aria-live="assertive"><p class="msg" id="error-msg">Waduh, gagal.</p></div>
+      <div id="state-error" class="state error" hidden aria-live="assertive"><p class="msg" id="error-msg">Oops, that failed.</p></div>
     </section>
 
     <!-- Result -->
     <section class="card reveal" id="result-panel" aria-labelledby="res-h" hidden>
-      <h2 id="res-h">Nih hasilnya</h2>
+      <h2 id="res-h">Here's your cutout</h2>
       <div class="compare" id="compare">
         <div class="cmp-frame">
-          <img id="img-before" class="cmp-img" alt="Foto asli sebelum diproses" />
+          <img id="img-before" class="cmp-img" alt="Original photo before processing" />
           <div class="cmp-after alpha" id="cmp-after-wrap">
-            <img id="img-after" class="cmp-img" alt="Foto tanpa background" />
+            <img id="img-after" class="cmp-img" alt="Photo with the background removed" />
           </div>
           <div class="cmp-handle" id="cmp-handle" aria-hidden="true">
             <span class="cmp-grip">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6 4 12l5 6M15 6l5 6-5 6"/></svg>
             </span>
           </div>
-          <span class="cmp-tag cmp-tag-l">Sebelum</span>
-          <span class="cmp-tag cmp-tag-r">Sesudah</span>
+          <span class="cmp-tag cmp-tag-l">Before</span>
+          <span class="cmp-tag cmp-tag-r">After</span>
         </div>
         <input type="range" id="cmp-range" class="cmp-range" min="0" max="100" value="55"
-          aria-label="Geser untuk banding sebelum dan sesudah" />
+          aria-label="Slide to compare before and after" />
       </div>
       <div class="actions">
         <button id="download" class="btn btn-primary">
@@ -410,35 +486,35 @@
         </button>
         <button id="share" class="btn" hidden>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"/></svg>
-          Bagikan
+          Share
         </button>
       </div>
 
       <!-- export quality: free is capped, Pro is full-res. Honest, always visible. -->
       <div class="quality" role="group" aria-labelledby="q-h">
         <div class="q-head">
-          <span id="q-h" class="q-title">Ukuran export</span>
+          <span id="q-h" class="q-title">Export size</span>
           <span id="q-dim" class="q-dim"></span>
         </div>
         <div class="seg">
-          <button class="seg-btn active" id="q-std" data-q="std">Standar (maks 1500px)</button>
+          <button class="seg-btn active" id="q-std" data-q="std">Standard (max 1500px)</button>
           <button class="seg-btn locked" id="q-hd" data-q="hd" aria-describedby="q-note">
             HD full-res <span class="chip-gold">PRO</span>
           </button>
         </div>
-        <p id="q-note" class="q-note">Versi gratis dikecilin biar ringan. HD full-res kebuka di Pro.</p>
+        <p id="q-note" class="q-note">The free version is scaled down to stay light. HD full-res unlocks with Pro.</p>
       </div>
 
       <div class="pro" id="pro-controls" hidden>
-        <h2 style="font-size:1.05rem;">Ganti background <span class="chip-gold">PRO</span></h2>
-        <div class="bg-row" role="group" aria-label="Pilih warna background">
-          <button class="swatch active" style="background:var(--mint-soft)" data-bg="transparent" aria-label="Transparan"></button>
-          <button class="swatch" style="background:#FFFFFF" data-bg="#FFFFFF" aria-label="Putih"></button>
-          <button class="swatch" style="background:#12352A" data-bg="#12352A" aria-label="Gelap"></button>
-          <button class="swatch" style="background:#1F724F" data-bg="#1F724F" aria-label="Hijau"></button>
+        <h2 style="font-size:1.05rem;">Change background <span class="chip-gold">PRO</span></h2>
+        <div class="bg-row" role="group" aria-label="Pick a background color">
+          <button class="swatch active" style="background:var(--mint-soft)" data-bg="transparent" aria-label="Transparent"></button>
+          <button class="swatch" style="background:#FFFFFF" data-bg="#FFFFFF" aria-label="White"></button>
+          <button class="swatch" style="background:#12352A" data-bg="#12352A" aria-label="Dark"></button>
+          <button class="swatch" style="background:#1F724F" data-bg="#1F724F" aria-label="Green"></button>
           <button class="swatch" style="background:#E76F51" data-bg="#E76F51" aria-label="Coral"></button>
-          <label class="swatch" style="background:linear-gradient(135deg,#ffd6a5,#a5d8ff);display:grid;place-items:center;position:relative;overflow:hidden" title="Warna bebas">
-            <input type="color" id="custom-bg" value="#ffd6a5" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer" aria-label="Warna bebas" />
+          <label class="swatch" style="background:linear-gradient(135deg,#ffd6a5,#a5d8ff);display:grid;place-items:center;position:relative;overflow:hidden" title="Custom color">
+            <input type="color" id="custom-bg" value="#ffd6a5" style="opacity:0;position:absolute;inset:0;width:100%;height:100%;cursor:pointer" aria-label="Custom color" />
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#12352A" stroke-width="2.4" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
           </label>
         </div>
@@ -447,12 +523,12 @@
 
     <!-- Batch (Pro): many photos at once -->
     <section class="card reveal" id="batch-panel" aria-labelledby="batch-h" hidden>
-      <h2 id="batch-h">Antrian foto <span class="chip-gold">PRO</span></h2>
+      <h2 id="batch-h">Photo queue <span class="chip-gold">PRO</span></h2>
       <div id="batch-grid" class="batch-grid"></div>
       <div class="actions">
-        <button id="batch-run" class="btn btn-primary">Proses semua</button>
-        <button id="batch-zip" class="btn" disabled>Download semua (ZIP)</button>
-        <button id="batch-clear" class="btn">Kosongin</button>
+        <button id="batch-run" class="btn btn-primary">Process all</button>
+        <button id="batch-zip" class="btn" disabled>Download all (ZIP)</button>
+        <button id="batch-clear" class="btn">Clear</button>
       </div>
       <p id="batch-status" class="q-note" aria-live="polite"></p>
     </section>
@@ -464,14 +540,14 @@
       </div>
       <div style="flex:1;">
         <b id="prem-h" style="font-family:var(--font-round);font-size:1.05rem;display:block;">AllRemover Pro</b>
-        <span style="font-size:.86rem;color:var(--muted);">Ganti background, export HD, banyak foto sekaligus.</span>
+        <span style="font-size:.86rem;color:var(--muted);">Change backgrounds, export HD, batch photos.</span>
       </div>
-      <button id="open-premium" class="btn btn-gold">Lihat</button>
+      <button id="open-premium" class="btn btn-gold">See it</button>
     </section>
 
     <!-- Monetization shelf: donate + ads + affiliate. Honest, config-driven. -->
     <section aria-labelledby="support-h">
-      <p class="shelf-title" id="support-h">Bantu AllRemover tetap gratis</p>
+      <p class="shelf-title" id="support-h">Help keep AllRemover free</p>
 
       <div id="ad-slot" class="ad-slot"></div>
 
@@ -479,43 +555,35 @@
     </section>
 
     <footer>
-      <details class="privacy">
-        <summary>Privasi &amp; cara kerja</summary>
-        <p>Foto kamu diproses langsung di browser pakai AI on-device, jadi
-        gambarnya <b>gak pernah dikirim ke server</b> mana pun. Yang butuh
-        internet cuma sekali download mesin AI di awal. Iklan di halaman ini
-        dimuat dari jaringan iklan pihak ketiga (skrip mereka bisa pasang
-        cookie sesuai kebijakan mereka), tapi itu terpisah dari foto kamu.</p>
-      </details>
-      AllRemover · dibikin jalan offline di browser kamu.
+      AllRemover · your photos never leave your device.
     </footer>
   </main>
 
   <!-- Premium modal -->
   <div id="overlay" class="overlay" hidden>
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" id="modal">
-      <button id="modal-close" class="btn m-close" aria-label="Tutup">
+      <button id="modal-close" class="btn m-close" aria-label="Close">
         <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
       </button>
       <h2 id="modal-title">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--gold-ink)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 2 2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.5-4.8 2.5.9-5.4L4.2 7.7l5.4-.8z"/></svg>
         AllRemover Pro
       </h2>
-      <div class="price">Rp0 <small>/ demo</small></div>
+      <div class="price">$0 <small>/ demo</small></div>
       <ul class="feat">
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Export HD full-res, gak dikecilin</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Proses banyak foto sekaligus + download ZIP</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Ganti background jadi warna apa aja</li>
-        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Tanpa iklan, selamanya</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Full-res HD export, no downscaling</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Batch a bunch of photos + download as ZIP</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Swap the background to any color</li>
+        <li><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> No ads, ever</li>
       </ul>
-      <button id="unlock" class="btn btn-gold btn-full">Coba Pro (demo)</button>
-      <p class="note">Ini demo. Pembayaran belum disambungkan, jadi tombol ini cuma buka fitur Pro buat kamu coba di perangkat ini.</p>
+      <button id="unlock" class="btn btn-gold btn-full">Try Pro (demo)</button>
+      <p class="note">This is a demo. Payments aren't wired up yet, so this button just unlocks Pro for you to try on this device.</p>
     </div>
   </div>
 
   <div id="toast" class="toast" role="status" aria-live="polite">
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-    <span id="toast-msg">Beres!</span>
+    <span id="toast-msg">Done!</span>
   </div>
 
   <div id="confetti" class="confetti" hidden aria-hidden="true"></div>

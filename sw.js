@@ -7,7 +7,7 @@
 // and safe to cache. They live in a separate, un-versioned bucket so a shell
 // bump doesn't force a multi-MB model re-download. Both are immutable, versioned
 // URLs, so cache-first is correct: once cached, never re-fetch.
-const CACHE = "allremover-v2";
+const CACHE = "allremover-v3";
 const ENGINE_CACHE = "allremover-engine-v1";
 // hosts that serve the immutable engine + model assets
 const ENGINE_HOSTS = ["esm.sh", "staticimgly.com"];
@@ -43,9 +43,12 @@ self.addEventListener("fetch", (e) => {
 
   // Engine + model (esm.sh, staticimgly.com): cache-first in a separate bucket.
   // These are large and immutable, so once fetched they serve offline forever.
+  // esm.sh sends `Vary: User-Agent`, and the Cache API honors Vary on lookup —
+  // but a SW Request can't read User-Agent, so a plain match() misses the cache
+  // offline. ignoreVary makes the lookup succeed. (Safe here: same URL = same asset.)
   if (ENGINE_HOSTS.includes(url.hostname)) {
     e.respondWith(
-      caches.match(req).then((hit) =>
+      caches.match(req, { ignoreVary: true }).then((hit) =>
         hit ||
         fetch(req).then((res) => {
           // cache successful responses; opaque (no-cors) responses have status 0
