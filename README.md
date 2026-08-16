@@ -24,7 +24,9 @@ jumlah pengunjung. Monetisasi lewat iklan + donasi, bukan lewat menombok biaya s
 - Download PNG transparan.
 - **Pro (demo, unlock lokal):** export HD full-res, ganti warna background, proses banyak
   foto sekaligus + download ZIP, tanpa iklan.
-- Bekerja offline setelah engine ter-cache.
+- Bekerja **offline penuh** setelah kunjungan pertama: app shell, engine AI (esm.sh), dan
+  model (staticimgly.com) semuanya di-cache oleh service worker. Sekali online buat
+  ngunduh mesin, setelah itu motong background jalan tanpa internet.
 
 ## Jalankan lokal
 
@@ -54,8 +56,10 @@ Alternatif CLI: `npm i -g vercel && vercel --prod` dari folder ini.
 Situs bisa dipasang seperti aplikasi ("Add to Home Screen"):
 
 - `manifest.webmanifest` — nama, ikon (192/512/maskable), warna tema, mode standalone.
-- `sw.js` — service worker yang cache app shell, jadi UI kebuka **offline** setelah
-  kunjungan pertama. Engine AI (esm.sh) di-cache oleh HTTP cache browser.
+- `sw.js` — service worker: cache app shell (UI kebuka offline setelah kunjungan
+  pertama) **dan** engine AI + model (esm.sh, staticimgly.com) di bucket terpisah,
+  jadi motong background pun jalan offline. Bucket engine tidak ikut ke-reset saat
+  app shell di-update, supaya model multi-MB tidak ke-download ulang.
 - Tombol **Pasang** di header muncul otomatis di browser yang mendukung
   `beforeinstallprompt` (mis. Chrome Android/desktop). Di iOS pakai
   Safari → Share → *Add to Home Screen*.
@@ -90,7 +94,8 @@ Semua diatur di `config.js` — kosong = slot placeholder yang jujur, tidak pern
 ## Privasi
 
 Foto diproses di browser dan tidak diunggah. Satu-satunya trafik keluar adalah unduhan
-engine AI sekali di awal dan skrip jaringan iklan pihak ketiga (terpisah dari foto).
+engine AI + model sekali di awal (esm.sh & staticimgly.com, di-cache buat offline) dan
+skrip jaringan iklan pihak ketiga (terpisah dari foto).
 
 ## Lisensi
 
