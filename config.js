@@ -6,8 +6,8 @@ window.ALLREMOVER_CONFIG = {
   donate: {
     enabled: true,
     // e.g. "https://saweria.co/username" or "https://trakteer.id/username"
-    url: "",
-    label: "Traktir kopi"
+    url: "https://saweria.co/AllRemover",
+    label: "Buy me a coffee"
   },
 
   // --- Ads. Pick ONE network. Adsterra is the pragmatic default: fast
@@ -18,8 +18,8 @@ window.ALLREMOVER_CONFIG = {
   // URL) and the key from the snippet. Leave blank to show an honest slot.
   adsterra: {
     enabled: true,
-    key: "",                 // e.g. "abcd1234ef..."  (the atOptions 'key')
-    scriptSrc: "",           // e.g. "//pl123456.effectiveratecpm.com/abcd.../invoke.js"
+    key: "1aaca550f057b7d50d2671cf8a18a37b",
+    scriptSrc: "https://www.highperformanceformat.com/1aaca550f057b7d50d2671cf8a18a37b/invoke.js",
     width: 320,
     height: 50
   },
@@ -32,9 +32,13 @@ window.ALLREMOVER_CONFIG = {
     slot: ""      // e.g. "1234567890"  (an ad unit's slot id)
   },
 
-  // --- Affiliate links. Add as many as you want; each becomes a clay tile. ---
+  // --- Affiliate links. Each entry is a clay tile. Leave `url` empty to show
+  // an honest labeled placeholder (never a fake link); fill it once you're
+  // approved into that program. Relevant picks for a photo/design audience. ---
   affiliates: [
-    // { title: "Canva Pro", desc: "Desain lanjutan", url: "https://...", emoji: "🎨" },
-    // { title: "Hosting murah", desc: "Buat website kamu", url: "https://...", emoji: "🚀" },
+    { title: "Photo & content gear", desc: "Ring lights, tripods, backdrops", url: "", emoji: "📸" },
+    { title: "Design tools", desc: "Templates & pro editors", url: "", emoji: "🎨" },
+    // Add more any time, e.g.:
+    // { title: "Canva Pro", desc: "Design everything", url: "https://...", emoji: "✨" },
   ]
 };

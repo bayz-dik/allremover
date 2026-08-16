@@ -445,13 +445,21 @@ function initTiles() {
   }
   const affs = Array.isArray(CFG.affiliates) ? CFG.affiliates : [];
   affs.forEach(a => {
+    const emoji = esc(a.emoji || "🔗");
+    const title = esc(a.title || "Partner");
+    const desc = esc(a.desc || "Affiliate link");
     if (isFilled(a.url)) {
       frags.push(`<a class="tile" href="${esc(a.url)}" target="_blank" rel="sponsored noopener">
-        <span class="emoji" aria-hidden="true">${esc(a.emoji || "🔗")}</span>
-        <span><span class="t">${esc(a.title || "Partner")}</span><span class="d">${esc(a.desc || "Affiliate link")}</span></span></a>`);
+        <span class="emoji" aria-hidden="true">${emoji}</span>
+        <span><span class="t">${title}</span><span class="d">${desc}</span></span></a>`);
+    } else if (a.title) {
+      // labeled placeholder: shows the real slot design, honestly "coming soon"
+      frags.push(`<div class="tile placeholder">
+        <span class="emoji" aria-hidden="true">${emoji}</span>
+        <span><span class="t">${title}</span><span class="d">Coming soon</span></span></div>`);
     }
   });
-  if (!affs.some(a => isFilled(a.url))) {
+  if (!affs.length) {
     frags.push(`<div class="tile placeholder">
       <span class="emoji" aria-hidden="true">🔗</span>
       <span><span class="t">Affiliate slot</span><span class="d">[add one in <code>affiliates</code> in config.js]</span></span></div>`);
