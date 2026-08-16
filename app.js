@@ -429,8 +429,11 @@ if (logoutActiveBtn) logoutActiveBtn.addEventListener("click", doLogout);
 
 // Lazy-load the Midtrans Snap script the first time the user pays, so a slow or
 // blocked Snap CDN never delays or blanks first render. Resolves with window.snap.
-const SNAP_SRC = "https://app.sandbox.midtrans.com/snap/snap.js";
-const SNAP_CLIENT_KEY = "Mid-client-ejlxiAW6XNUsg2Di";
+const MT = CFG.midtrans || {};
+const SNAP_SRC = MT.production
+  ? "https://app.midtrans.com/snap/snap.js"
+  : "https://app.sandbox.midtrans.com/snap/snap.js";
+const SNAP_CLIENT_KEY = MT.production ? MT.productionClientKey : MT.sandboxClientKey;
 let _snapLoad = null;
 function loadSnap() {
   if (window.snap) return Promise.resolve(window.snap);

@@ -2,6 +2,19 @@
 // Fill in your own links/IDs. Anything left as "" or the placeholder stays
 // visible as an honest, clearly-labeled "belum diisi" slot (never faked).
 window.ALLREMOVER_CONFIG = {
+  // --- Midtrans (client side). The SERVER key is a Vercel env var and never
+  // lives here. Going live = flip `production` to true AND set the Vercel env
+  // `MIDTRANS_IS_PRODUCTION=true` + swap MIDTRANS_SERVER_KEY to the prod key.
+  // Keep both in sync: front-end Snap URL/client key must match the back-end
+  // environment, or Snap opens against the wrong side and payment silently fails.
+  midtrans: {
+    production: false,
+    sandboxClientKey: "Mid-client-ejlxiAW6XNUsg2Di",
+    // fill this from Midtrans dashboard (Production → Settings → Access keys)
+    // once production is approved, then set production:true above.
+    productionClientKey: ""
+  },
+
   // --- Donation (Saweria / Trakteer / Ko-fi). Paste your page URL. ---
   donate: {
     enabled: true,
