@@ -81,14 +81,17 @@ export async function logout() {
 }
 
 // Read the user's subscription doc and return the Pro expiry as a JS Date,
-// or null if there's no active subscription. Firestore stores `proUntil` as a
-// millisecond timestamp (set by our server after a confirmed payment).
+// or null if there's no active subscription. `proUntil` may be stored either as
+// a millisecond number (what our server writes) or a Firestore Timestamp (handy
+// when setting it by hand in the console) — we accept both.
 export async function getProUntil(uid) {
   const { db, fsMod } = await ensureFirebase();
   const snap = await fsMod.getDoc(fsMod.doc(db, "users", uid));
   if (!snap.exists()) return null;
-  const ms = snap.data().proUntil;
-  if (typeof ms !== "number") return null;
-  const until = new Date(ms);
+  const raw = snap.data().proUntil;
+  let until = null;
+  if (typeof raw === "number") until = new Date(raw);
+  else if (raw && typeof raw.toDate === "function") until = raw.toDate(); // Firestore Timestamp
+  if (!until) return null;
   return until.getTime() > Date.now() ? until : null;
 }
