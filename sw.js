@@ -7,7 +7,7 @@
 // and safe to cache. They live in a separate, un-versioned bucket so a shell
 // bump doesn't force a multi-MB model re-download. Both are immutable, versioned
 // URLs, so cache-first is correct: once cached, never re-fetch.
-const CACHE = "allremover-v9";
+const CACHE = "allremover-v10";
 const ENGINE_CACHE = "allremover-engine-v1";
 // hosts that serve the immutable engine + model assets
 const ENGINE_HOSTS = ["esm.sh", "staticimgly.com"];
@@ -16,6 +16,9 @@ const SHELL = [
   "./index.html",
   "./about.html",
   "./privacy.html",
+  "./terms.html",
+  "./refund.html",
+  "./contact.html",
   "./app.js",
   "./config.js",
   "./logo.svg",
