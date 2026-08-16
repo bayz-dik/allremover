@@ -13,12 +13,12 @@
 <meta property="og:type" content="website" />
 <meta property="og:title" content="AllRemover — background gone in a snap" />
 <meta property="og:description" content="Free, runs on your device. No upload, no sign-up, no server." />
-<meta property="og:image" content="https://bayz-dik.github.io/allremover/og-image.png" />
-<meta property="og:url" content="https://bayz-dik.github.io/allremover/" />
+<meta property="og:image" content="https://www.temanbaik.web.id/og-image.png" />
+<meta property="og:url" content="https://www.temanbaik.web.id/" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="AllRemover — background gone in a snap" />
 <meta name="twitter:description" content="Free, runs on your device. No upload, no sign-up." />
-<meta name="twitter:image" content="https://bayz-dik.github.io/allremover/og-image.png" />
+<meta name="twitter:image" content="https://www.temanbaik.web.id/og-image.png" />
 <meta name="theme-color" content="#1F724F" />
 <link rel="manifest" href="manifest.webmanifest" />
 <!-- AdSense loader is injected by app.js only when a real client id is set in config.js -->
@@ -299,6 +299,9 @@
   .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
   footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 10px; line-height: 1.5; }
   footer a { color: var(--primary); font-weight: 600; }
+  .footer-links { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 8px; }
+  .footer-links a { text-decoration: none; }
+  .footer-links a:hover { text-decoration: underline; }
 
   /* ============================================================
      EXTRA MATERIAL FX — layered on top of the clay base:
@@ -556,6 +559,11 @@
     </section>
 
     <footer>
+      <nav class="footer-links">
+        <a href="about.html">About</a>
+        <span aria-hidden="true">·</span>
+        <a href="privacy.html">Privacy</a>
+      </nav>
       AllRemover · your photos never leave your device.
     </footer>
   </main>

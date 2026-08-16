@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About — AllRemover</title>
+<meta name="description" content="What AllRemover is, how it works, and why it's free and private." />
+<link rel="icon" type="image/svg+xml" href="logo.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<meta name="theme-color" content="#1F724F" />
+<style>
+  :root {
+    --primary: #1F724F; --mint-soft: #DBEFE1; --cream: #F2FBF3;
+    --ink: #12352A; --muted: #3F6B57; --clay-dark: #B7D8C2; --clay-light: #FFFFFF;
+    --font-round: -apple-system, BlinkMacSystemFont, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+    --font-text: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--cream); color: var(--ink); font-family: var(--font-text); -webkit-font-smoothing: antialiased; line-height: 1.6; }
+  body { min-height: 100dvh; display: flex; justify-content: center; padding: 32px 20px 64px; }
+  .doc { width: 100%; max-width: 640px; }
+  .back { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--primary); font-family: var(--font-round); font-weight: 700; font-size: .9rem; margin-bottom: 20px; }
+  .back svg { width: 18px; height: 18px; }
+  .card { background: var(--cream); border-radius: 32px; box-shadow: 16px 16px 30px var(--clay-dark), -16px -16px 30px var(--clay-light); padding: 32px 28px; }
+  h1 { font-family: var(--font-round); font-weight: 800; font-size: 2rem; letter-spacing: -0.02em; margin: 0 0 16px; }
+  h2 { font-family: var(--font-round); font-weight: 700; font-size: 1.2rem; margin: 26px 0 8px; }
+  p { margin: 0 0 12px; }
+  ul { margin: 0 0 12px; padding-left: 20px; }
+  li { margin-bottom: 6px; }
+  a { color: var(--primary); font-weight: 600; }
+  .lead { background: var(--mint-soft); border-radius: 18px; padding: 16px 18px; font-family: var(--font-round); font-weight: 600; }
+  .cta { display: inline-block; margin-top: 8px; background: var(--primary); color: #fff; text-decoration: none; font-family: var(--font-round); font-weight: 700; padding: 13px 22px; border-radius: 999px; }
+  footer { text-align: center; color: var(--muted); font-size: .78rem; margin-top: 22px; }
+</style>
+</head>
+<body>
+  <main class="doc">
+    <a class="back" href="index.html">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to AllRemover
+    </a>
+    <article class="card">
+      <h1>About AllRemover</h1>
+
+      <p class="lead">AllRemover is a free tool that removes the background from
+      any photo, right in your browser. No upload, no sign-up, no server.</p>
+
+      <h2>What it does</h2>
+      <p>Drop in a photo and AllRemover cuts out the background for you, leaving
+      a clean transparent PNG you can download or share. Great for product
+      shots, profile pictures, stickers, memes, or anything where you want just
+      the subject and none of the clutter behind it.</p>
+
+      <h2>How it works</h2>
+      <p>Most background removers upload your photo to a server, run it through
+      their AI, and send it back. AllRemover is different: the AI model runs
+      directly on your device, inside your browser. Your photo never leaves your
+      phone or computer.</p>
+      <p>The first time you use it, the site downloads the AI engine once, then
+      caches it. After that, background removal works even offline.</p>
+
+      <h2>Why it's free</h2>
+      <p>Because the processing happens on your device, running AllRemover costs
+      us almost nothing, no matter how many people use it. We keep it free and
+      cover the small running costs through unobtrusive ads, optional donations,
+      and affiliate links to relevant products. There's an optional demo "Pro"
+      mode with extra features like full-resolution export and batch processing.</p>
+
+      <h2>Privacy first</h2>
+      <p>Your images are processed locally and never uploaded. For the full
+      details, see our <a href="privacy.html">Privacy Policy</a>.</p>
+
+      <p><a class="cta" href="index.html">Try AllRemover →</a></p>
+    </article>
+    <footer>AllRemover · your photos never leave your device.</footer>
+  </main>
+</body>
+</html>
